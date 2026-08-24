@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
     <title>Simulacro EGEL | 120 reactivos</title>
     <script src="catalogo-simuladores.js"></script>
     <style>
@@ -17,8 +19,8 @@
     </main>
     <script>
         const QUESTION_COUNT=120,DURATION_SECONDS=4.5*60*60;
-        const student=localStorage.getItem('egel_student_name');
-        const group=localStorage.getItem('egel_student_group')||'';
+        const student=sessionStorage.getItem('egel_student_name');
+        const group=sessionStorage.getItem('egel_student_group')||'';
         if(!student)location.replace('index.html');
         const shuffle=(items)=>{const shuffled=[...items];for(let index=shuffled.length-1;index>0;index--){const randomIndex=Math.floor(Math.random()*(index+1));[shuffled[index],shuffled[randomIndex]]=[shuffled[randomIndex],shuffled[index]]}return shuffled};
         const questions=shuffle(window.BANCO_PREGUNTAS_EGEL||[]).slice(0,QUESTION_COUNT);let currentQuestion=0;let answers=Array(questions.length).fill(null);let remainingSeconds=DURATION_SECONDS;let completed=false;
