@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+*.code-workspace
+
+# Archivos temporales y registros
+*.log
+tmp/
+temp/
+
+# Variables y secretos locales
+.env
+.env.*
+!.env.example
+
+# Dependencias de Node, si agregas herramientas después
+node_modules/

@@ -1,0 +1,42 @@
+<!DOCTYPE html><html lang="es"><head><script src="../registro-compartido.js"></script><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ordena el PAE</title>
+<style>
+:root{--p:#0369a1;--bg:#f4f7fb;--card:#fff;--text:#1f2937;--muted:#667085;--line:#dfe6ee;--ok:#16834a;--bad:#b42318;--soft:#eef4fb}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:radial-gradient(circle at 8% 4%,color-mix(in srgb,var(--p) 12%,transparent),transparent 25%),var(--bg);color:var(--text)}
+.wrap{max-width:1000px;margin:auto;padding:24px 15px 55px} .hero{background:linear-gradient(135deg,#173f73,var(--p));color:#fff;border-radius:26px;padding:26px;box-shadow:0 16px 38px #173f7320}
+.hero h1{margin:0 0 7px;font-size:clamp(27px,5vw,43px)} .hero p{margin:5px 0;color:#edf4fb} .author{font-weight:900;margin-top:10px!important}
+.card{background:var(--card);border:1px solid #edf1f6;border-radius:22px;padding:22px;margin-top:20px;box-shadow:0 14px 34px #173f7314}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px} label{display:block;font-weight:800;font-size:14px;margin-bottom:6px} input{width:100%;padding:13px;border:1px solid var(--line);border-radius:13px;font-size:16px}
+.btn{border:0;border-radius:13px;padding:12px 17px;font-weight:900;font-size:15px;cursor:pointer} .primary{background:var(--p);color:#fff} .soft{background:var(--soft);color:var(--p)}
+.actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin-top:17px} .hidden{display:none!important} .note{color:var(--muted);line-height:1.55}
+.badge{display:inline-block;padding:7px 11px;border-radius:999px;background:var(--soft);color:var(--p);font-size:13px;font-weight:900} .top{display:flex;justify-content:space-between;gap:9px;flex-wrap:wrap}
+.progress{height:10px;background:#e9eef4;border-radius:999px;overflow:hidden;margin:13px 0 19px} .progress>div{height:100%;background:var(--p);transition:.2s}
+.case{background:#f9fbfd;border:1px solid #e3eaf2;border-radius:17px;padding:17px;line-height:1.55} .case h2{margin:0 0 7px;font-size:21px}
+.options{display:grid;gap:10px;margin-top:14px} .opt{border:2px solid #e2e8f0;background:#fff;border-radius:14px;padding:13px 14px;text-align:left;font-weight:800;cursor:pointer;font-size:15px}
+.opt:hover{border-color:color-mix(in srgb,var(--p) 45%,#dfe6ee)} .opt.good{border-color:#65c88f;background:#effaf3;color:#145f38} .opt.bad{border-color:#e99b94;background:#fff3f2;color:#8b211b}
+.feedback{display:none;margin-top:15px;padding:15px;border-radius:14px;line-height:1.55} .feedback.show{display:block} .feedback.good{background:#eefaf3;border:1px solid #bce7cc;color:#16613a} .feedback.bad{background:#fff4f2;border:1px solid #efbbb6;color:#8a251f}
+.result{text-align:center} .score{font-size:42px;font-weight:950;color:var(--p)} .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:17px 0} .stat{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fbfcfe} .stat b{display:block;font-size:21px;color:var(--p)}
+.review{text-align:left;margin-top:18px} .review>div{border-top:1px solid var(--line);padding:11px 0} footer{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+@media(max-width:720px){.grid2,.stats{grid-template-columns:1fr}.hero,.card{padding:17px}}
+@media print{#start,#game,.noprint{display:none!important} #result{display:block!important} body{background:#fff} .card,.hero{box-shadow:none}}
+</style></head><body><div class="wrap">
+<section class="hero"><h1>🔄 Ordena el Proceso de Enfermería</h1><p><b>Actividad 15 · EGEL-Enfermería</b></p><p>Construye la secuencia correcta y reconoce cada fase.</p><p class="author">Elaboró: Alejandro Torres Reyes</p></section>
+<section id="start" class="card"><h2 style="margin-top:0">Registro del estudiante</h2><p class="note">Completa tus datos. La actividad incluye retroalimentación y autoevaluación automática.</p>
+<div class="grid2"><div><label>Nombre del estudiante</label><input id="student" placeholder="Nombre completo"></div><div><label>Grupo / Sección</label><input id="group" placeholder="Ej. 8° A"></div></div>
+<div class="actions"><button class="btn primary" id="startBtn">Comenzar →</button></div></section>
+<section id="game" class="card hidden"><div class="top"><span class="badge" id="who"></span><span class="badge">Reto secuencial</span></div>
+<p class="note">Haz clic en las fases en el orden correcto del Proceso de Atención de Enfermería.</p><div id="pool" class="options"></div><h3>Tu secuencia:</h3><div id="seq" class="case"></div><div id="fb" class="feedback"></div>
+<div class="actions"><button class="btn soft" id="reset">Reiniciar secuencia</button><button class="btn primary" id="check">Evaluar</button></div></section>
+<section id="result" class="card result hidden"><span class="badge">Autoevaluación final</span><h2>Resultado</h2><p id="rname"></p><div class="score" id="pct"></div>
+<div class="review" id="review"></div><div class="actions noprint"><button class="btn soft" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button><button class="btn primary" id="again">↻ Repetir</button></div></section><footer>EGEL-Enfermería · Elaboró: Alejandro Torres Reyes</footer></div>
+<script>
+const phases=["Valoración","Diagnóstico","Planeación","Ejecución","Evaluación"]; let picked=[],name="",grp="";
+const $=x=>document.getElementById(x);
+$("startBtn").onclick=()=>{name=$("student").value.trim();grp=$("group").value.trim();if(!name){alert("Escribe el nombre del estudiante.");return}$("start").classList.add("hidden");$("game").classList.remove("hidden");$("who").textContent=grp?name+" · "+grp:name;draw()};
+function draw(){picked=[];$("seq").innerHTML="Aún no has seleccionado fases.";let order=[...phases].sort(()=>Math.random()-.5),p=$("pool");p.innerHTML="";order.forEach(x=>{let b=document.createElement("button");b.className="opt";b.textContent=x;b.onclick=()=>{if(!picked.includes(x)){picked.push(x);b.disabled=true;$("seq").textContent=picked.join("  →  ")}};p.appendChild(b)});$("fb").className="feedback";}
+$("reset").onclick=draw;
+$("check").onclick=()=>{if(picked.length<5){alert("Selecciona las cinco fases.");return}let ok=phases.every((x,i)=>picked[i]===x);$("fb").className="feedback show "+(ok?"good":"bad");$("fb").innerHTML="<b>"+(ok?"✅ Secuencia correcta":"❌ Secuencia incorrecta")+"</b><br>El material presenta cinco etapas subsecuentes e interrelacionadas: valoración, diagnóstico, planeación, ejecución y evaluación.";setTimeout(()=>finish(ok),800)};
+function finish(ok){$("game").classList.add("hidden");$("result").classList.remove("hidden");$("rname").textContent=grp?name+" · "+grp:name;$("pct").textContent=ok?"100%":"0%";$("review").innerHTML="<h3>Clave de aprendizaje</h3><div><b>Valoración:</b> recogida e interpretación de información.</div><div><b>Diagnóstico:</b> juicio clínico sobre respuestas humanas.</div><div><b>Planeación:</b> propuesta de acciones y objetivos.</div><div><b>Ejecución:</b> puesta en práctica de cuidados planificados.</div><div><b>Evaluación:</b> comparación de resultados con objetivos.</div>"}
+$("again").onclick=()=>{$("result").classList.add("hidden");$("start").classList.remove("hidden");$("student").value=name;$("group").value=grp};
+</script></body></html>

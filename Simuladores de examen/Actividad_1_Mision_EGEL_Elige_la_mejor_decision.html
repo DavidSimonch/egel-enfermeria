@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><script src="../registro-compartido.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Misión EGEL: Elige la mejor decisión</title>
+<style>
+  :root{
+    --bg:#f5f7fb;
+    --card:#ffffff;
+    --text:#172033;
+    --muted:#667085;
+    --primary:#1f4f8a;
+    --primary2:#2c6db2;
+    --ok:#18864b;
+    --bad:#b42318;
+    --warn:#a15c00;
+    --line:#dbe2ea;
+    --shadow:0 18px 50px rgba(23,32,51,.12);
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(circle at 10% 5%, rgba(44,109,178,.14), transparent 26%),
+      radial-gradient(circle at 90% 10%, rgba(31,79,138,.10), transparent 28%),
+      var(--bg);
+    color:var(--text);
+    min-height:100vh;
+  }
+  .wrap{max-width:980px;margin:auto;padding:28px 18px 60px}
+  .hero{
+    background:linear-gradient(135deg,#173b69,#285f9e);
+    color:#fff;
+    border-radius:28px;
+    padding:28px;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero:after{
+    content:"";
+    position:absolute; width:220px; height:220px; border-radius:50%;
+    right:-70px; top:-80px; background:rgba(255,255,255,.08);
+  }
+  .hero h1{margin:0 0 8px;font-size:clamp(28px,5vw,44px);line-height:1.04}
+  .hero p{margin:6px 0;color:#e6eef9}
+  .author{font-weight:700;margin-top:14px!important}
+  .card{
+    background:var(--card); margin-top:22px; border-radius:var(--radius);
+    padding:24px; box-shadow:var(--shadow); border:1px solid #eef2f6;
+  }
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  label{font-weight:700;font-size:14px;display:block;margin-bottom:7px}
+  input{
+    width:100%;padding:14px 14px;border:1px solid var(--line);border-radius:14px;
+    font-size:16px;outline:none;background:#fff;color:var(--text)
+  }
+  input:focus{border-color:var(--primary2);box-shadow:0 0 0 4px rgba(44,109,178,.12)}
+  .btn{
+    border:0;border-radius:14px;padding:13px 18px;font-weight:800;font-size:15px;
+    cursor:pointer;transition:.18s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn-primary{background:var(--primary);color:white}
+  .btn-secondary{background:#eef4fb;color:var(--primary)}
+  .btn-ghost{background:#fff;color:var(--text);border:1px solid var(--line)}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
+  .badge{background:#eef4fb;color:var(--primary);padding:8px 12px;border-radius:999px;font-size:13px;font-weight:800}
+  .progress{height:11px;background:#e8edf3;border-radius:999px;overflow:hidden;margin:6px 0 22px}
+  .progress > div{height:100%;width:0;background:linear-gradient(90deg,#285f9e,#4d8dd2);transition:.3s}
+  .case{
+    background:#f8fafc;border:1px solid #e7edf4;border-radius:18px;padding:18px;margin-bottom:18px
+  }
+  .case .tag{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--primary);margin-bottom:8px}
+  .case p{margin:0;line-height:1.55}
+  .question{font-size:20px;font-weight:900;line-height:1.35;margin:18px 0}
+  .options{display:grid;gap:12px}
+  .option{
+    width:100%;text-align:left;background:#fff;border:2px solid #e5ebf1;border-radius:16px;
+    padding:15px 16px;font-size:16px;font-weight:700;color:var(--text);cursor:pointer;
+  }
+  .option:hover{border-color:#aac4df;background:#f8fbff}
+  .option.correct{border-color:#50b47c;background:#effbf4;color:#11663a}
+  .option.wrong{border-color:#e58c86;background:#fff3f2;color:#8b1d17}
+  .option:disabled{cursor:default;opacity:.96}
+  .feedback{display:none;margin-top:18px;padding:16px;border-radius:16px;line-height:1.55}
+  .feedback.ok{display:block;background:#eefaf3;border:1px solid #b9e8ca;color:#155f37}
+  .feedback.bad{display:block;background:#fff4f3;border:1px solid #f2b8b3;color:#8a241d}
+  .feedback strong{display:block;margin-bottom:5px}
+  .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+  .hidden{display:none!important}
+  .score-ring{
+    width:145px;height:145px;border-radius:50%;display:grid;place-items:center;margin:10px auto 18px;
+    background:conic-gradient(var(--primary) 0deg, var(--primary) 0deg, #e7edf4 0deg);
+    position:relative;
+  }
+  .score-ring:after{content:"";position:absolute;inset:13px;background:white;border-radius:50%}
+  .score-ring span{position:relative;z-index:2;font-size:28px;font-weight:900}
+  .result{text-align:center}
+  .result h2{font-size:30px;margin:4px 0 8px}
+  .result p{color:var(--muted)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0}
+  .stat{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fbfcfe}
+  .stat b{display:block;font-size:22px;color:var(--primary)}
+  .review{margin-top:22px;text-align:left}
+  .review-item{border-top:1px solid var(--line);padding:14px 0}
+  .review-item:first-child{border-top:0}
+  .review-item .rtitle{font-weight:900}
+  .review-item small{color:var(--muted)}
+  .note{font-size:13px;color:var(--muted);margin-top:12px}
+  .footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+  @media (max-width:700px){
+    .grid,.stats{grid-template-columns:1fr}
+    .topbar{align-items:flex-start;flex-direction:column}
+    .hero,.card{padding:20px}
+  }
+  @media print{
+    body{background:white}
+    .hero,.card{box-shadow:none}
+    #startScreen,#quizScreen,.no-print{display:none!important}
+    #resultScreen{display:block!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>🏥 Misión EGEL</h1>
+    <p><b>Actividad 1:</b> Elige la mejor decisión</p>
+    <p>Curso-Taller de Retroalimentación · EGEL-Enfermería</p>
+    <p class="author">Elaboró: Alejandro Torres Reyes</p>
+  </section>
+
+  <section id="startScreen" class="card">
+    <h2 style="margin-top:0">Registro del estudiante</h2>
+    <p style="color:var(--muted)">Resuelve 10 casos basados en el apartado de Introducción al EGEL-Enfermería. Obtendrás calificación y retroalimentación automática.</p>
+    <div class="grid">
+      <div>
+        <label for="studentName">Nombre del estudiante</label>
+        <input id="studentName" placeholder="Escribe tu nombre completo" autocomplete="name">
+      </div>
+      <div>
+        <label for="group">Grupo / Sección</label>
+        <input id="group" placeholder="Ej. 8° A">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="startBtn">Comenzar misión →</button>
+    </div>
+    <p class="note">Cada reactivo tiene una sola respuesta correcta. Después de responder podrás revisar el fundamento antes de continuar.</p>
+  </section>
+
+  <section id="quizScreen" class="card hidden">
+    <div class="topbar">
+      <div>
+        <div class="badge" id="studentBadge">Estudiante</div>
+      </div>
+      <div class="badge" id="counter">Pregunta 1 de 10</div>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+
+    <div class="case">
+      <div class="tag" id="caseTag">Caso 1</div>
+      <p id="caseText"></p>
+    </div>
+
+    <div class="question" id="questionText"></div>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="feedback"></div>
+
+    <div class="actions">
+      <button class="btn btn-primary hidden" id="nextBtn">Siguiente caso →</button>
+    </div>
+  </section>
+
+  <section id="resultScreen" class="card result hidden">
+    <div class="badge">Autoevaluación final</div>
+    <h2>Resultado de la misión</h2>
+    <p id="resultStudent"></p>
+    <div class="score-ring" id="scoreRing"><span id="scorePercent">0%</span></div>
+
+    <div class="stats">
+      <div class="stat"><b id="scoreCorrect">0</b><span>Aciertos</span></div>
+      <div class="stat"><b id="scoreWrong">0</b><span>Errores</span></div>
+      <div class="stat"><b id="scoreGrade">0</b><span>Calificación / 100</span></div>
+      <div class="stat"><b id="scoreLevel">—</b><span>Nivel</span></div>
+    </div>
+
+    <div class="review" id="review"></div>
+
+    <div class="actions no-print">
+      <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <button class="btn btn-primary" id="restartBtn">↻ Intentar nuevamente</button>
+    </div>
+  </section>
+
+  <div class="footer">Actividad académica · EGEL-Enfermería · Elaboró: Alejandro Torres Reyes</div>
+</div>
+
+<script>
+const questions = [
+  {
+    tag:"Salud comunitaria",
+    case:"Se asignó una comunidad de 11 000 habitantes a una jurisdicción sanitaria. El 30% de las aguas residuales se trata adecuadamente; la seguridad alimentaria es moderada en 15%; la contaminación atmosférica es de 10 µg/m³ y existe una cancha de basquetbol.",
+    q:"¿Qué aspecto refleja un entorno saludable para los habitantes de la comunidad?",
+    options:["Seguridad alimentaria","Calidad de las fuentes de agua","Condición atmosférica"],
+    answer:2,
+    feedback:"La condición atmosférica es la opción correcta según el material: se señala un valor de 10 µg/m³, dentro del límite de 15 µg/m³ referido en la argumentación. En contraste, el agua tratada es solo 30% y la seguridad alimentaria es moderada en 15%."
+  },
+  {
+    tag:"Programas de salud",
+    case:"En un microdiagnóstico familiar se identifican 18 mujeres embarazadas mayores de 35 años, seis sin control prenatal; además existen consumo de alcohol y tabaco, diabetes, hipertensión y alimentación no saludable.",
+    q:"¿Qué programa de salud se debe poner en marcha para mujeres de 20 a 59 años en este caso?",
+    options:[
+      "Promoción de la salud bucal",
+      "Salud sexual y reproductiva, promoción y otorgamiento de métodos anticonceptivos",
+      "Salud sexual y reproductiva, alimentación"
+    ],
+    answer:1,
+    feedback:"El material destaca el riesgo del embarazo después de los 35 años y la importancia de la vigilancia prenatal y de los métodos anticonceptivos para retrasar o espaciar embarazos."
+  },
+  {
+    tag:"Adulto mayor",
+    case:"En una comunidad rural, 80% pertenece a un nivel socioeconómico bajo, 60% presenta anemia, 40% tiene fracturas de cadera y 35% de las mujeres refiere diagnóstico de cáncer cervicouterino.",
+    q:"¿Qué programa de salud específico para adultos mayores de 60 años y más se debe implementar?",
+    options:["Evaluación del estado nutricional","Detección y tratamiento de osteoporosis","Prevención y control de cáncer cervicouterino"],
+    answer:1,
+    feedback:"La respuesta señalada en el material es detección y tratamiento de osteoporosis, debido a la alta frecuencia de fracturas de cadera y a la relación entre osteoporosis y fragilidad ósea."
+  },
+  {
+    tag:"Planeación en salud",
+    case:"En un programa de prevención y control de diabetes se plantea fortalecer la cobertura de pacientes en control, realizar medición anual de HbA1c y promover orientación nutricional y actividad física.",
+    q:"¿A qué componente del programa de salud se hace referencia cuando se describen acciones específicas para cumplir el objetivo?",
+    options:["Objetivo","Indicador","Línea de acción"],
+    answer:2,
+    feedback:"La línea de acción corresponde a las acciones específicas que permiten llevar a cabo el cumplimiento del objetivo general. En el material se ejemplifica con promover orientación nutricional y actividad física."
+  },
+  {
+    tag:"Participación social",
+    case:"Una comunidad se reúne para nombrar representantes que determinen necesidades de salud. La población solicita mayor cercanía del servicio médico, áreas verdes y mejoras en la limpieza, con la intención de gestionar un plan de mejora multidisciplinario.",
+    q:"¿Qué tipo de participación social está presente en el proyecto de salud?",
+    options:["Asociación de usuarios","Veedurías ciudadanas en salud","Comités de participación comunitaria"],
+    answer:2,
+    feedback:"El material describe a los comités de participación comunitaria como órganos de representación ciudadana que representan los intereses colectivos de los habitantes ante las autoridades."
+  },
+  {
+    tag:"Objetivos de Desarrollo Sostenible",
+    case:"En una comunidad rural, las enfermedades relacionadas con el agua y el saneamiento continúan entre las principales causas de muerte en menores de 5 años.",
+    q:"¿Cuál es la meta de desarrollo sostenible más relacionada con garantizar saneamiento e higiene adecuados y equitativos?",
+    options:["Uso eficiente de los recursos hídricos","Acceso al saneamiento equitativo","Mejora de la calidad del agua"],
+    answer:1,
+    feedback:"El material cita la meta 6.2: lograr acceso a servicios de saneamiento e higiene adecuados y equitativos para todos, con atención a poblaciones en situación de vulnerabilidad."
+  },
+  {
+    tag:"Valoración nutricional",
+    case:"Paciente de 40 años con peso de 95 kg y talla de 1.70 m. El cálculo mostrado en el material es: IMC = 95 / (1.70)² = 32.87.",
+    q:"¿En qué clasificación del índice de masa corporal se ubica el paciente?",
+    options:["Obesidad clase I","Obesidad clase II","Sobrepeso"],
+    answer:0,
+    feedback:"Con el IMC de 32.87 presentado en el material, la respuesta indicada es obesidad clase I."
+  },
+  {
+    tag:"Diagnóstico oportuno",
+    case:"Paciente de 67 años con dolor pélvico, nicturia, dificultad para orinar, goteo postmiccional, hematuria y antecedentes de obstrucción progresiva durante la micción.",
+    q:"¿Qué estudio se debe realizar al paciente para el diagnóstico oportuno, de acuerdo con las opciones del material?",
+    options:["Tacto rectal","Radiografía de pelvis","Antígeno prostático específico"],
+    answer:2,
+    feedback:"El material señala la prueba de PSA o antígeno prostático específico como análisis de sangre utilizado para detectar cáncer de próstata antes de que cause síntomas."
+  },
+  {
+    tag:"Diabetes mellitus",
+    case:"Paciente con polidipsia, poliuria y polifagia. Presenta HbA1c de 7%, glucosa plasmática en ayuno menor de 100 mg/dL y LDL de 80 mg/dL.",
+    q:"¿Qué dato es un indicador para realizar el diagnóstico oportuno de diabetes mellitus?",
+    options:["Niveles de HbA1c de 7%","Glucosa plasmática en ayuno < 100 mg/dL","LDL de 80 mg/dL"],
+    answer:0,
+    feedback:"El material establece que una HbA1c de 6.5% o mayor señala diabetes. Por ello, un valor de 7% es el dato diagnóstico entre las opciones."
+  },
+  {
+    tag:"Hipertensión arterial",
+    case:"Paciente adulto con insuficiencia renal: cefalea, acúfenos, fosfenos, IMC de 29 kg/m², TA de 140/90 mmHg y FC de 100/min.",
+    q:"¿Qué signo permite establecer el diagnóstico oportuno de hipertensión arterial según el caso?",
+    options:["Taquicardia","Presión arterial","Sobrepeso"],
+    answer:1,
+    feedback:"De acuerdo con la argumentación del material, el dato clave es la presión arterial registrada en 140/90 mmHg."
+  }
+];
+
+let current = 0;
+let correct = 0;
+let answers = [];
+let student = "";
+let group = "";
+
+const startScreen = document.getElementById("startScreen");
+const quizScreen = document.getElementById("quizScreen");
+const resultScreen = document.getElementById("resultScreen");
+const startBtn = document.getElementById("startBtn");
+const nextBtn = document.getElementById("nextBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+startBtn.addEventListener("click", () => {
+  student = document.getElementById("studentName").value.trim();
+  group = document.getElementById("group").value.trim();
+  if(!student){
+    alert("Escribe el nombre del estudiante para comenzar.");
+    document.getElementById("studentName").focus();
+    return;
+  }
+  localStorage.setItem("egel_student", student);
+  localStorage.setItem("egel_group", group);
+  startScreen.classList.add("hidden");
+  quizScreen.classList.remove("hidden");
+  renderQuestion();
+});
+
+function renderQuestion(){
+  const item = questions[current];
+  document.getElementById("studentBadge").textContent = group ? `${student} · ${group}` : student;
+  document.getElementById("counter").textContent = `Pregunta ${current+1} de ${questions.length}`;
+  document.getElementById("progressBar").style.width = `${(current/questions.length)*100}%`;
+  document.getElementById("caseTag").textContent = `${item.tag} · Caso ${current+1}`;
+  document.getElementById("caseText").textContent = item.case;
+  document.getElementById("questionText").textContent = item.q;
+  const options = document.getElementById("options");
+  options.innerHTML = "";
+  const letters = ["A","B","C"];
+  item.options.forEach((opt, i) => {
+    const b = document.createElement("button");
+    b.className = "option";
+    b.innerHTML = `<b>${letters[i]}.</b> ${opt}`;
+    b.addEventListener("click", () => selectAnswer(i));
+    options.appendChild(b);
+  });
+  const fb = document.getElementById("feedback");
+  fb.className = "feedback";
+  fb.innerHTML = "";
+  nextBtn.classList.add("hidden");
+}
+
+function selectAnswer(index){
+  const item = questions[current];
+  const btns = [...document.querySelectorAll(".option")];
+  btns.forEach(b => b.disabled = true);
+  btns[item.answer].classList.add("correct");
+
+  const isCorrect = index === item.answer;
+  if(isCorrect){
+    correct++;
+  }else{
+    btns[index].classList.add("wrong");
+  }
+  answers.push({index, correct:isCorrect});
+  const fb = document.getElementById("feedback");
+  fb.className = `feedback ${isCorrect ? "ok" : "bad"}`;
+  fb.innerHTML = `<strong>${isCorrect ? "✅ Respuesta correcta" : "❌ Respuesta incorrecta"}</strong>${item.feedback}`;
+  nextBtn.classList.remove("hidden");
+  document.getElementById("progressBar").style.width = `${((current+1)/questions.length)*100}%`;
+}
+
+nextBtn.addEventListener("click", () => {
+  current++;
+  if(current < questions.length){
+    renderQuestion();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else{
+    showResults();
+  }
+});
+
+function showResults(){
+  quizScreen.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+  const pct = Math.round((correct/questions.length)*100);
+  const wrong = questions.length - correct;
+  let level = pct >= 90 ? "Excelente" : pct >= 80 ? "Satisfactorio" : pct >= 70 ? "En proceso" : "Reforzar";
+  document.getElementById("resultStudent").textContent = group ? `${student} · Grupo/Sección: ${group}` : student;
+  document.getElementById("scoreCorrect").textContent = correct;
+  document.getElementById("scoreWrong").textContent = wrong;
+  document.getElementById("scoreGrade").textContent = pct;
+  document.getElementById("scoreLevel").textContent = level;
+  document.getElementById("scorePercent").textContent = `${pct}%`;
+  document.getElementById("scoreRing").style.background = `conic-gradient(var(--primary) 0deg, var(--primary) ${pct*3.6}deg, #e7edf4 ${pct*3.6}deg)`;
+
+  const review = document.getElementById("review");
+  review.innerHTML = `<h3>Revisión de respuestas</h3>`;
+  questions.forEach((q,i) => {
+    const a = answers[i];
+    const div = document.createElement("div");
+    div.className = "review-item";
+    div.innerHTML = `
+      <div class="rtitle">${a.correct ? "✅" : "❌"} ${i+1}. ${q.q}</div>
+      <small>Tu respuesta: ${q.options[a.index]} · Correcta: ${q.options[q.answer]}</small>
+      ${a.correct ? "" : `<div style="margin-top:6px">${q.feedback}</div>`}
+    `;
+    review.appendChild(div);
+  });
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+restartBtn.addEventListener("click", () => {
+  current = 0; correct = 0; answers = [];
+  resultScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+  document.getElementById("studentName").value = student;
+  document.getElementById("group").value = group;
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+  const savedName = localStorage.getItem("egel_student");
+  const savedGroup = localStorage.getItem("egel_group");
+  if(savedName) document.getElementById("studentName").value = savedName;
+  if(savedGroup) document.getElementById("group").value = savedGroup;
+});
+</script>
+</body>
+</html>

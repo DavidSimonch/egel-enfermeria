@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><script src="../registro-compartido.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duelo Diagnóstico - EGEL Enfermería</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --text:#1f2937; --muted:#667085;
+  --primary:#1f4f8a; --primary2:#2f6fb1; --ok:#16834a; --bad:#b42318;
+  --gold:#d6a72b; --line:#dfe6ee; --soft:#eef4fb; --shadow:0 18px 45px rgba(31,79,138,.12);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 8% 5%,rgba(47,111,177,.13),transparent 24%),
+    radial-gradient(circle at 92% 8%,rgba(214,167,43,.10),transparent 24%),
+    var(--bg);
+}
+.wrap{max-width:1020px;margin:auto;padding:28px 16px 60px}
+.hero{
+  background:linear-gradient(135deg,#173f73,#2f6fb1);
+  color:#fff;border-radius:28px;padding:28px;box-shadow:var(--shadow);
+  position:relative;overflow:hidden
+}
+.hero:after{content:"⚔️";position:absolute;right:24px;top:8px;font-size:104px;opacity:.13}
+.hero h1{margin:0 0 7px;font-size:clamp(28px,5vw,44px)}
+.hero p{margin:5px 0;color:#e9f1fb}
+.hero .author{font-weight:900;margin-top:12px}
+.card{
+  background:var(--card);border:1px solid #edf1f6;border-radius:22px;
+  padding:23px;margin-top:22px;box-shadow:var(--shadow)
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:800;font-size:14px;margin-bottom:7px}
+input{
+  width:100%;padding:14px;border:1px solid var(--line);border-radius:14px;
+  font-size:16px;outline:none
+}
+input:focus{border-color:var(--primary2);box-shadow:0 0 0 4px rgba(47,111,177,.12)}
+.btn{
+  border:0;border-radius:14px;padding:13px 18px;font-size:15px;font-weight:900;
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-soft{background:var(--soft);color:var(--primary)}
+.actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px}
+.hidden{display:none!important}
+.badge{
+  display:inline-block;padding:8px 12px;border-radius:999px;background:var(--soft);
+  color:var(--primary);font-size:13px;font-weight:900
+}
+.topbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.progress{height:11px;background:#e9eef4;border-radius:999px;overflow:hidden;margin:14px 0 20px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,#2f6fb1,#d6a72b);transition:.25s}
+.case{
+  background:#f9fbfd;border:1px solid #e4ebf2;border-radius:18px;padding:18px
+}
+.case .tag{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:var(--primary)}
+.case h2{margin:8px 0 8px;font-size:22px}
+.case p{margin:0;line-height:1.55}
+.question{font-size:20px;font-weight:900;line-height:1.4;margin:18px 0 14px;text-align:center}
+.arena{
+  display:grid;grid-template-columns:1fr 78px 1fr;gap:14px;align-items:stretch
+}
+.fighter{
+  min-height:180px;border:3px solid #e2e8f0;background:#fff;border-radius:20px;
+  padding:20px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;
+  align-items:center;text-align:center;transition:.18s;position:relative
+}
+.fighter:hover{transform:translateY(-3px);border-color:#9ebcda;box-shadow:0 10px 24px rgba(31,79,138,.10)}
+.fighter .letter{
+  width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  background:var(--soft);color:var(--primary);font-weight:950;margin-bottom:12px
+}
+.fighter strong{font-size:19px;line-height:1.35}
+.fighter.correct{border-color:#65c88f;background:#effaf3;color:#145f38}
+.fighter.wrong{border-color:#ea9a94;background:#fff3f2;color:#8b211b}
+.fighter:disabled{cursor:default}
+.vs{
+  align-self:center;justify-self:center;width:62px;height:62px;border-radius:50%;
+  display:grid;place-items:center;background:linear-gradient(135deg,#173f73,#d6a72b);
+  color:white;font-size:19px;font-weight:950;box-shadow:0 8px 20px rgba(31,79,138,.18)
+}
+.feedback{display:none;margin-top:18px;padding:16px;border-radius:16px;line-height:1.55}
+.feedback.show{display:block}
+.feedback.ok{background:#eefaf3;border:1px solid #bce7cc;color:#16613a}
+.feedback.bad{background:#fff4f2;border:1px solid #efbbb6;color:#8a251f}
+.reason{
+  margin-top:10px;padding:10px 12px;border-left:5px solid var(--gold);
+  background:#fffdf5;border-radius:10px;color:#5f4a12
+}
+.result{text-align:center}
+.trophy{font-size:54px;margin-bottom:4px}
+.score{
+  width:150px;height:150px;border-radius:50%;display:grid;place-items:center;margin:12px auto 18px;
+  position:relative;background:conic-gradient(var(--primary) 0deg,#e9eef4 0deg)
+}
+.score:after{content:"";position:absolute;inset:13px;background:#fff;border-radius:50%}
+.score span{position:relative;z-index:2;font-size:30px;font-weight:900}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.stat{border:1px solid var(--line);border-radius:15px;padding:14px;background:#fbfcfe}
+.stat b{display:block;font-size:22px;color:var(--primary)}
+.review{text-align:left;margin-top:20px}
+.review-item{padding:13px 0;border-top:1px solid var(--line)}
+.review-item:first-child{border-top:0}
+.review-item small{color:var(--muted)}
+.note{color:var(--muted);line-height:1.55}
+.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:760px){
+  .grid2,.stats{grid-template-columns:1fr}
+  .arena{grid-template-columns:1fr}
+  .vs{width:54px;height:54px}
+  .hero,.card{padding:18px}
+}
+@media print{
+  body{background:#fff}
+  .hero,.card{box-shadow:none}
+  #startScreen,#gameScreen,.no-print{display:none!important}
+  #resultScreen{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>⚔️ Duelo diagnóstico</h1>
+    <p><b>Actividad 9 · EGEL-Enfermería</b></p>
+    <p>Dos opciones entran al duelo. Solo una responde mejor al caso.</p>
+    <p class="author">Elaboró: Alejandro Torres Reyes</p>
+  </section>
+
+  <section id="startScreen" class="card">
+    <h2 style="margin-top:0">Registro del estudiante</h2>
+    <p class="note">
+      En cada ronda aparecerán dos opciones diagnósticas o de detección.
+      Selecciona la que mejor corresponda con los datos del caso. 
+      Obtendrás retroalimentación inmediata y una autoevaluación final.
+    </p>
+    <div class="grid2">
+      <div>
+        <label>Nombre del estudiante</label>
+        <input id="studentName" placeholder="Nombre completo">
+      </div>
+      <div>
+        <label>Grupo / Sección</label>
+        <input id="group" placeholder="Ej. 8° A">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="startBtn">Entrar al duelo →</button>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="card hidden">
+    <div class="topbar">
+      <div class="badge" id="studentBadge"></div>
+      <div class="badge" id="counter"></div>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+
+    <div class="case">
+      <div class="tag" id="tag"></div>
+      <h2 id="title"></h2>
+      <p id="caseText"></p>
+    </div>
+
+    <div class="question" id="question"></div>
+
+    <div class="arena">
+      <button class="fighter" id="fighterA">
+        <div class="letter">A</div>
+        <strong id="textA"></strong>
+      </button>
+
+      <div class="vs">VS</div>
+
+      <button class="fighter" id="fighterB">
+        <div class="letter">B</div>
+        <strong id="textB"></strong>
+      </button>
+    </div>
+
+    <div id="feedback" class="feedback"></div>
+
+    <div class="actions">
+      <button class="btn btn-primary hidden" id="nextBtn">Siguiente duelo →</button>
+    </div>
+  </section>
+
+  <section id="resultScreen" class="card result hidden">
+    <div class="trophy">🏆</div>
+    <div class="badge">Autoevaluación final</div>
+    <h2>Resultado del duelo</h2>
+    <p id="resultName"></p>
+
+    <div class="score" id="scoreRing"><span id="scorePct">0%</span></div>
+
+    <div class="stats">
+      <div class="stat"><b id="correctCount">0</b><span>Duelos ganados</span></div>
+      <div class="stat"><b id="wrongCount">0</b><span>Duelos perdidos</span></div>
+      <div class="stat"><b id="grade">0</b><span>Calificación /100</span></div>
+      <div class="stat"><b id="level">—</b><span>Nivel</span></div>
+    </div>
+
+    <div class="review" id="review"></div>
+
+    <div class="actions no-print">
+      <button class="btn btn-soft" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <button class="btn btn-primary" id="restartBtn">↻ Volver a competir</button>
+    </div>
+  </section>
+
+  <div class="footer">EGEL-Enfermería · Actividad interactiva · Elaboró: Alejandro Torres Reyes</div>
+</div>
+
+<script>
+const duels = [
+  {
+    tag:"Próstata",
+    title:"Duelo 1 · Síntomas urinarios",
+    case:"Paciente de 67 años con dolor pélvico, nicturia, dificultad para orinar, goteo postmiccional y hematuria.",
+    q:"¿Qué opción corresponde mejor al estudio de detección señalado en el material?",
+    options:["Radiografía de pelvis","Antígeno prostático específico (PSA)"],
+    answer:1,
+    feedback:"El material describe el PSA como un análisis de sangre que mide una proteína producida por la próstata y que se utiliza para detectar cáncer prostático."
+  },
+  {
+    tag:"Diabetes mellitus",
+    title:"Duelo 2 · HbA1c",
+    case:"Paciente con polidipsia, poliuria y polifagia. Su HbA1c es de 7%.",
+    q:"¿Qué interpretación corresponde?",
+    options:["Prediabetes","Diabetes"],
+    answer:1,
+    feedback:"El material indica que una HbA1c de 6.5% o mayor señala diabetes."
+  },
+  {
+    tag:"Diabetes mellitus",
+    title:"Duelo 3 · Glucosa en ayuno",
+    case:"Se obtiene una glucosa plasmática en ayuno de 112 mg/dL.",
+    q:"¿Cómo se clasifica según los rangos presentados?",
+    options:["Prediabetes","Diabetes"],
+    answer:0,
+    feedback:"El material establece que valores de 100 a 125 mg/dL en ayuno indican prediabetes."
+  },
+  {
+    tag:"Diabetes mellitus",
+    title:"Duelo 4 · Glucosa en ayuno",
+    case:"Se obtiene una glucosa plasmática en ayuno de 130 mg/dL.",
+    q:"¿Cómo se interpreta?",
+    options:["Normal","Diabetes"],
+    answer:1,
+    feedback:"Según el material, 126 mg/dL o más en ayuno indica diabetes."
+  },
+  {
+    tag:"Prueba de tolerancia",
+    title:"Duelo 5 · Glucosa a las 2 horas",
+    case:"En una prueba de tolerancia a la glucosa, el valor a las 2 horas es de 175 mg/dL.",
+    q:"¿Qué clasificación corresponde?",
+    options:["Prediabetes","Diabetes"],
+    answer:0,
+    feedback:"El material señala que 140 a 199 mg/dL a las 2 horas indica prediabetes."
+  },
+  {
+    tag:"Cáncer cervicouterino",
+    title:"Duelo 6 · Riesgo oncogénico",
+    case:"Se requiere una prueba que determine si el Virus del Papiloma Humano es de alto riesgo oncogénico.",
+    q:"¿Qué estudio corresponde mejor?",
+    options:["Tipificación de VPH","Colposcopia"],
+    answer:0,
+    feedback:"El material define la tipificación del VPH como la prueba que permite determinar si el virus es de alto riesgo oncogénico."
+  },
+  {
+    tag:"Cáncer cervicouterino",
+    title:"Duelo 7 · Lesiones precursoras",
+    case:"Se necesita obtener una muestra del cuello uterino para detectar lesiones precursoras o cáncer.",
+    q:"¿Qué estudio corresponde?",
+    options:["Citología cervicovaginal","Radiografía de pelvis"],
+    answer:0,
+    feedback:"El material describe la citología cervicovaginal como la toma de una muestra de vagina y cuello uterino para detectar lesiones precursoras o cáncer."
+  },
+  {
+    tag:"Cáncer cervicouterino",
+    title:"Duelo 8 · Papanicolaou anormal",
+    case:"Una paciente presenta un resultado anormal en el examen de Papanicolaou y requiere una exploración detallada del cuello uterino.",
+    q:"¿Qué procedimiento corresponde?",
+    options:["Colposcopia","Tipificación de VPH"],
+    answer:0,
+    feedback:"El material señala que la colposcopia permite examinar detalladamente el cuello uterino, vagina y vulva y puede indicarse cuando el Papanicolaou es anormal."
+  },
+  {
+    tag:"Cáncer de mama",
+    title:"Duelo 9 · Factor de riesgo",
+    case:"Paciente de 40 años con sintomatología mamaria. Refiere antecedente de cáncer de mama en el padre y haber realizado lactancia materna exclusiva.",
+    q:"¿Qué dato ayuda más a identificar riesgo de cáncer de mama en el caso?",
+    options:["Antecedente familiar de cáncer de mama","Lactancia materna exclusiva"],
+    answer:0,
+    feedback:"El material incluye los antecedentes familiares de cáncer de mama u ovario entre los factores relacionados con mayor riesgo."
+  },
+  {
+    tag:"Cáncer de mama",
+    title:"Duelo 10 · Confirmación diagnóstica",
+    case:"Se analiza la diferencia entre un caso confirmado de cáncer de mama y una sospecha clínica.",
+    q:"¿Qué elemento confirma el diagnóstico según el material?",
+    options:["Estudio histopatológico","Antecedente familiar"],
+    answer:0,
+    feedback:"El material define el caso confirmado de cáncer de mama como aquel en el que el diagnóstico se corrobora mediante estudio histopatológico."
+  },
+  {
+    tag:"Hipertensión arterial",
+    title:"Duelo 11 · Dato clave",
+    case:"Paciente con cefalea, acúfenos, fosfenos, IMC de 29 kg/m², FC de 100/min y TA de 140/90 mmHg.",
+    q:"¿Qué dato es clave para el diagnóstico oportuno de hipertensión en el caso?",
+    options:["Presión arterial","Sobrepeso"],
+    answer:0,
+    feedback:"En la argumentación del material, la presión arterial de 140/90 mmHg es el dato clave del caso."
+  },
+  {
+    tag:"Datos clínicos",
+    title:"Duelo 12 · Objetivo o subjetivo",
+    case:"Paciente con sensación de falta de aire y frecuencia respiratoria de 10/min.",
+    q:"¿Cuál es el dato objetivo?",
+    options:["Sensación de falta de aire","Frecuencia respiratoria"],
+    answer:1,
+    feedback:"El material identifica la frecuencia respiratoria como un signo vital medible y, por tanto, como dato objetivo."
+  }
+];
+
+let current=0, correct=0, answers=[];
+let student="", group="";
+
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const resultScreen=document.getElementById("resultScreen");
+const fighterA=document.getElementById("fighterA");
+const fighterB=document.getElementById("fighterB");
+
+document.getElementById("startBtn").onclick=()=>{
+  student=document.getElementById("studentName").value.trim();
+  group=document.getElementById("group").value.trim();
+
+  if(!student){
+    alert("Escribe el nombre del estudiante para comenzar.");
+    document.getElementById("studentName").focus();
+    return;
+  }
+
+  localStorage.setItem("duelo_student",student);
+  localStorage.setItem("duelo_group",group);
+
+  startScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+  renderDuel();
+};
+
+function renderDuel(){
+  const item=duels[current];
+
+  document.getElementById("studentBadge").textContent=group?`${student} · ${group}`:student;
+  document.getElementById("counter").textContent=`Duelo ${current+1} de ${duels.length}`;
+  document.getElementById("progressBar").style.width=`${(current/duels.length)*100}%`;
+  document.getElementById("tag").textContent=item.tag;
+  document.getElementById("title").textContent=item.title;
+  document.getElementById("caseText").textContent=item.case;
+  document.getElementById("question").textContent=item.q;
+  document.getElementById("textA").textContent=item.options[0];
+  document.getElementById("textB").textContent=item.options[1];
+
+  [fighterA,fighterB].forEach(b=>{
+    b.disabled=false;
+    b.classList.remove("correct","wrong");
+  });
+
+  const fb=document.getElementById("feedback");
+  fb.className="feedback";
+  fb.innerHTML="";
+  document.getElementById("nextBtn").classList.add("hidden");
+}
+
+fighterA.onclick=()=>selectAnswer(0);
+fighterB.onclick=()=>selectAnswer(1);
+
+function selectAnswer(index){
+  const item=duels[current];
+  const buttons=[fighterA,fighterB];
+
+  buttons.forEach(b=>b.disabled=true);
+
+  const ok=index===item.answer;
+  if(ok) correct++;
+  answers.push({index,correct:ok});
+
+  buttons[item.answer].classList.add("correct");
+  if(!ok) buttons[index].classList.add("wrong");
+
+  const fb=document.getElementById("feedback");
+  fb.className=`feedback show ${ok?"ok":"bad"}`;
+  fb.innerHTML=`
+    <strong>${ok?"🏆 Duelo ganado":"⚠️ Duelo perdido"}</strong>
+    <div class="reason"><b>Fundamento:</b> ${item.feedback}</div>
+  `;
+
+  document.getElementById("progressBar").style.width=`${((current+1)/duels.length)*100}%`;
+  document.getElementById("nextBtn").classList.remove("hidden");
+}
+
+document.getElementById("nextBtn").onclick=()=>{
+  current++;
+  if(current<duels.length){
+    renderDuel();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else{
+    showResults();
+  }
+};
+
+function showResults(){
+  gameScreen.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+
+  const pct=Math.round(correct/duels.length*100);
+  const wrong=duels.length-correct;
+  const level=pct>=90?"Campeón EGEL":pct>=80?"Avanzado":pct>=70?"En entrenamiento":"Reforzar";
+
+  document.getElementById("resultName").textContent=group?`${student} · Grupo/Sección: ${group}`:student;
+  document.getElementById("correctCount").textContent=correct;
+  document.getElementById("wrongCount").textContent=wrong;
+  document.getElementById("grade").textContent=pct;
+  document.getElementById("level").textContent=level;
+  document.getElementById("scorePct").textContent=pct+"%";
+  document.getElementById("scoreRing").style.background=
+    `conic-gradient(var(--primary) 0deg,var(--primary) ${pct*3.6}deg,#e9eef4 ${pct*3.6}deg)`;
+
+  const review=document.getElementById("review");
+  review.innerHTML="<h3>Revisión de duelos</h3>";
+
+  duels.forEach((q,i)=>{
+    const a=answers[i];
+    const d=document.createElement("div");
+    d.className="review-item";
+    d.innerHTML=`
+      <b>${a.correct?"✅":"❌"} ${i+1}. ${q.title}</b><br>
+      <small>Tu elección: ${q.options[a.index]} · Ganadora: ${q.options[q.answer]}</small>
+      ${a.correct?"":`<div style="margin-top:6px">${q.feedback}</div>`}
+    `;
+    review.appendChild(d);
+  });
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.getElementById("restartBtn").onclick=()=>{
+  current=0;correct=0;answers=[];
+  resultScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+  document.getElementById("studentName").value=student;
+  document.getElementById("group").value=group;
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+window.addEventListener("DOMContentLoaded",()=>{
+  const s=localStorage.getItem("duelo_student");
+  const g=localStorage.getItem("duelo_group");
+  if(s) document.getElementById("studentName").value=s;
+  if(g) document.getElementById("group").value=g;
+});
+</script>
+</body>
+</html>

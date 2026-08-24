@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><script src="../registro-compartido.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reto EGEL de 60 segundos</title>
+<style>
+:root{
+  --bg:#f4f7fb; --card:#ffffff; --text:#1d2939; --muted:#667085;
+  --primary:#173f73; --primary2:#2f6fb1; --ok:#16834a; --bad:#b42318;
+  --warn:#d97706; --line:#dfe6ee; --soft:#eef4fb; --shadow:0 18px 45px rgba(23,63,115,.13);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 8% 5%, rgba(47,111,177,.13), transparent 24%),
+    radial-gradient(circle at 92% 8%, rgba(23,63,115,.10), transparent 24%),
+    var(--bg);
+}
+.wrap{max-width:980px;margin:auto;padding:28px 16px 60px}
+.hero{
+  background:linear-gradient(135deg,#173f73,#2f6fb1);
+  color:#fff;border-radius:28px;padding:28px;box-shadow:var(--shadow);position:relative;overflow:hidden
+}
+.hero:after{content:"⏱️";position:absolute;right:25px;top:10px;font-size:100px;opacity:.13}
+.hero h1{margin:0 0 7px;font-size:clamp(28px,5vw,44px)}
+.hero p{margin:5px 0;color:#e9f1fb}
+.hero .author{font-weight:900;margin-top:12px}
+.card{
+  background:var(--card);border:1px solid #edf1f6;border-radius:22px;
+  padding:23px;margin-top:22px;box-shadow:var(--shadow)
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:800;font-size:14px;margin-bottom:7px}
+input{
+  width:100%;padding:14px;border:1px solid var(--line);border-radius:14px;font-size:16px;outline:none
+}
+input:focus{border-color:var(--primary2);box-shadow:0 0 0 4px rgba(47,111,177,.12)}
+.btn{
+  border:0;border-radius:14px;padding:13px 18px;font-size:15px;font-weight:900;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-soft{background:var(--soft);color:var(--primary)}
+.actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px}
+.hidden{display:none!important}
+.badge{
+  display:inline-block;padding:8px 12px;border-radius:999px;background:var(--soft);
+  color:var(--primary);font-size:13px;font-weight:900
+}
+.topbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.progress{height:11px;background:#e9eef4;border-radius:999px;overflow:hidden;margin:14px 0 20px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,#2f6fb1,#6ea8e0);transition:.25s}
+.timerbox{
+  display:flex;align-items:center;justify-content:center;gap:12px;margin:10px 0 18px
+}
+.timer{
+  min-width:120px;text-align:center;font-size:34px;font-weight:950;color:var(--primary);
+  border:3px solid var(--primary);border-radius:18px;padding:10px 16px;background:#f8fbff
+}
+.timer.warn{color:var(--warn);border-color:var(--warn);background:#fff8eb}
+.timer.danger{color:var(--bad);border-color:var(--bad);background:#fff3f2;animation:pulse .7s infinite}
+@keyframes pulse{50%{transform:scale(1.03)}}
+.case{
+  background:#f9fbfd;border:1px solid #e4ebf2;border-radius:18px;padding:18px
+}
+.case .tag{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:var(--primary)}
+.case p{line-height:1.55;margin:9px 0 0}
+.question{font-size:20px;font-weight:900;line-height:1.4;margin:18px 0 12px}
+.options{display:grid;gap:11px}
+.option{
+  width:100%;text-align:left;border:2px solid #e2e8f0;background:#fff;border-radius:15px;
+  padding:14px 15px;font-weight:800;font-size:15px;cursor:pointer;color:var(--text)
+}
+.option:hover{border-color:#aac4df;background:#f8fbff}
+.option.correct{border-color:#65c88f;background:#effaf3;color:#145f38}
+.option.wrong{border-color:#ea9a94;background:#fff3f2;color:#8b211b}
+.option:disabled{cursor:default}
+.feedback{display:none;margin-top:18px;padding:16px;border-radius:16px;line-height:1.55}
+.feedback.show{display:block}
+.feedback.ok{background:#eefaf3;border:1px solid #bce7cc;color:#16613a}
+.feedback.bad{background:#fff4f2;border:1px solid #efbbb6;color:#8a251f}
+.feedback.time{background:#fff8eb;border:1px solid #f4cf8f;color:#8a4b00}
+.result{text-align:center}
+.score{
+  width:150px;height:150px;border-radius:50%;display:grid;place-items:center;margin:12px auto 18px;
+  position:relative;background:conic-gradient(var(--primary) 0deg,#e9eef4 0deg)
+}
+.score:after{content:"";position:absolute;inset:13px;background:#fff;border-radius:50%}
+.score span{position:relative;z-index:2;font-size:30px;font-weight:900}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0}
+.stat{border:1px solid var(--line);border-radius:15px;padding:14px;background:#fbfcfe}
+.stat b{display:block;font-size:22px;color:var(--primary)}
+.review{text-align:left;margin-top:20px}
+.review-item{padding:13px 0;border-top:1px solid var(--line)}
+.review-item:first-child{border-top:0}
+.review-item small{color:var(--muted)}
+.note{color:var(--muted);line-height:1.5}
+.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:760px){
+  .grid2,.stats{grid-template-columns:1fr}
+  .hero,.card{padding:18px}
+}
+@media print{
+  body{background:#fff}
+  .hero,.card{box-shadow:none}
+  #startScreen,#gameScreen,.no-print{display:none!important}
+  #resultScreen{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>⏱️ Reto EGEL de 60 segundos</h1>
+    <p><b>Actividad 6 · EGEL-Enfermería</b></p>
+    <p>Resuelve cada caso antes de que termine el tiempo.</p>
+    <p class="author">Elaboró: Alejandro Torres Reyes</p>
+  </section>
+
+  <section id="startScreen" class="card">
+    <h2 style="margin-top:0">Registro del estudiante</h2>
+    <p class="note">
+      Tendrás <b>60 segundos por reactivo</b>. Si el tiempo termina, el sistema marcará el reactivo
+      como no contestado y mostrará la retroalimentación antes de continuar.
+    </p>
+    <div class="grid2">
+      <div>
+        <label>Nombre del estudiante</label>
+        <input id="studentName" placeholder="Nombre completo">
+      </div>
+      <div>
+        <label>Grupo / Sección</label>
+        <input id="group" placeholder="Ej. 8° A">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="startBtn">Iniciar reto →</button>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="card hidden">
+    <div class="topbar">
+      <div class="badge" id="studentBadge"></div>
+      <div class="badge" id="counter"></div>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+
+    <div class="timerbox">
+      <div class="timer" id="timer">60 s</div>
+    </div>
+
+    <div class="case">
+      <div class="tag" id="tag"></div>
+      <p id="caseText"></p>
+    </div>
+
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="feedback"></div>
+
+    <div class="actions">
+      <button class="btn btn-primary hidden" id="nextBtn">Siguiente reactivo →</button>
+    </div>
+  </section>
+
+  <section id="resultScreen" class="card result hidden">
+    <div class="badge">Autoevaluación final</div>
+    <h2>Resultado del reto</h2>
+    <p id="resultName"></p>
+
+    <div class="score" id="scoreRing"><span id="scorePct">0%</span></div>
+
+    <div class="stats">
+      <div class="stat"><b id="correctCount">0</b><span>Aciertos</span></div>
+      <div class="stat"><b id="wrongCount">0</b><span>Errores</span></div>
+      <div class="stat"><b id="timeoutCount">0</b><span>Sin tiempo</span></div>
+      <div class="stat"><b id="grade">0</b><span>Calificación /100</span></div>
+      <div class="stat"><b id="level">—</b><span>Nivel</span></div>
+    </div>
+
+    <div class="review" id="review"></div>
+
+    <div class="actions no-print">
+      <button class="btn btn-soft" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <button class="btn btn-primary" id="restartBtn">↻ Intentar nuevamente</button>
+    </div>
+  </section>
+
+  <div class="footer">EGEL-Enfermería · Actividad interactiva · Elaboró: Alejandro Torres Reyes</div>
+</div>
+
+<script>
+const questions = [
+  {
+    tag:"Salud comunitaria",
+    case:"En una comunidad de 11 000 habitantes, solo 30% de las aguas residuales recibe tratamiento adecuado; la seguridad alimentaria es moderada en 15% y la contaminación atmosférica es de 10 µg/m³.",
+    q:"¿Qué aspecto refleja un entorno saludable en este caso?",
+    options:["Seguridad alimentaria","Calidad de las fuentes de agua","Condición atmosférica"],
+    answer:2,
+    feedback:"En el material, la condición atmosférica de 10 µg/m³ se considera dentro del límite referido; el agua y la seguridad alimentaria presentan condiciones menos favorables."
+  },
+  {
+    tag:"Salud de la mujer",
+    case:"Durante un microdiagnóstico familiar se identifican 18 mujeres embarazadas mayores de 35 años, de las cuales seis no acuden a control prenatal.",
+    q:"¿Qué programa de salud debe priorizarse para mujeres de 20 a 59 años?",
+    options:["Promoción de la salud bucal","Salud sexual y reproductiva, promoción y otorgamiento de métodos anticonceptivos","Salud sexual y reproductiva, alimentación"],
+    answer:1,
+    feedback:"El material destaca el riesgo del embarazo después de los 35 años, la vigilancia prenatal y el uso de métodos anticonceptivos para retrasar o espaciar embarazos."
+  },
+  {
+    tag:"Adulto mayor",
+    case:"En una comunidad rural, 40% de las personas adultas mayores presenta fracturas de cadera.",
+    q:"¿Qué programa específico debe implementarse?",
+    options:["Evaluación del estado nutricional","Detección y tratamiento de osteoporosis","Prevención y control de cáncer cervicouterino"],
+    answer:1,
+    feedback:"El material relaciona las fracturas de cadera con osteoporosis y propone su detección y tratamiento."
+  },
+  {
+    tag:"Programas de salud",
+    case:"Un programa de diabetes establece promover orientación nutricional y actividad física como acciones específicas para alcanzar sus metas.",
+    q:"¿A qué componente del programa se hace referencia?",
+    options:["Objetivo","Indicador","Línea de acción"],
+    answer:2,
+    feedback:"La línea de acción corresponde a las acciones específicas para llevar a cabo el cumplimiento del objetivo general."
+  },
+  {
+    tag:"Participación social",
+    case:"Una comunidad nombra representantes para expresar necesidades colectivas ante las autoridades y gestionar un plan de mejora.",
+    q:"¿Qué tipo de participación social está presente?",
+    options:["Asociación de usuarios","Veedurías ciudadanas en salud","Comités de participación comunitaria"],
+    answer:2,
+    feedback:"El material define los comités de participación comunitaria como órganos de representación ciudadana de los intereses colectivos."
+  },
+  {
+    tag:"ODS 6",
+    case:"Las enfermedades relacionadas con agua y saneamiento continúan entre las principales causas de fallecimiento en menores de 5 años.",
+    q:"¿Qué meta corresponde de manera más directa al acceso a saneamiento e higiene adecuados y equitativos?",
+    options:["Uso eficiente de los recursos hídricos","Acceso al saneamiento equitativo","Mejora de la calidad del agua"],
+    answer:1,
+    feedback:"El material cita la meta 6.2 del ODS 6, orientada al acceso a servicios de saneamiento e higiene adecuados y equitativos."
+  },
+  {
+    tag:"IMC",
+    case:"Paciente de 40 años con peso de 95 kg y talla de 1.70 m. En el material se calcula un IMC de 32.87 kg/m².",
+    q:"¿En qué clasificación se ubica?",
+    options:["Obesidad clase I","Obesidad clase II","Sobrepeso"],
+    answer:0,
+    feedback:"Según el cálculo presentado en el material, el IMC de 32.87 corresponde a obesidad clase I."
+  },
+  {
+    tag:"Diagnóstico oportuno",
+    case:"Paciente de 67 años con dolor pélvico, nicturia, dificultad para orinar, goteo postmiccional y hematuria.",
+    q:"¿Qué estudio se plantea para el diagnóstico oportuno en el material?",
+    options:["Tacto rectal","Radiografía de pelvis","Antígeno prostático específico"],
+    answer:2,
+    feedback:"El material señala la prueba de PSA o antígeno prostático específico como estudio para detectar cáncer de próstata."
+  },
+  {
+    tag:"Diabetes mellitus",
+    case:"Paciente con polidipsia, poliuria y polifagia. HbA1c de 7%, glucosa plasmática en ayuno menor de 100 mg/dL y LDL de 80 mg/dL.",
+    q:"¿Qué dato es indicador para el diagnóstico oportuno de diabetes mellitus?",
+    options:["HbA1c de 7%","Glucosa en ayuno < 100 mg/dL","LDL de 80 mg/dL"],
+    answer:0,
+    feedback:"El material establece que una HbA1c de 6.5% o mayor señala diabetes; por ello, 7% es el hallazgo determinante entre las opciones."
+  },
+  {
+    tag:"Hipertensión arterial",
+    case:"Paciente con cefalea, acúfenos, fosfenos, IMC de 29 kg/m², TA de 140/90 mmHg y FC de 100/min.",
+    q:"¿Qué signo permite establecer el diagnóstico oportuno de hipertensión arterial en el caso?",
+    options:["Taquicardia","Presión arterial","Sobrepeso"],
+    answer:1,
+    feedback:"De acuerdo con la argumentación del material, la presión arterial de 140/90 mmHg es el dato clave."
+  },
+  {
+    tag:"Educación para la salud",
+    case:"En un municipio se reportan numerosos casos de enfermedades digestivas infecciosas y parasitarias, especialmente gastroenteritis en niños de 0 a 10 años.",
+    q:"¿Qué estrategia educativa debe implementarse?",
+    options:["Recomendaciones para limpieza de viviendas","Mecanismos de higiene general","Educar colectivamente sobre la correcta higiene de manos"],
+    answer:2,
+    feedback:"El material recomienda la educación colectiva sobre higiene de manos y señala su utilidad para reducir el riesgo de diarrea."
+  },
+  {
+    tag:"Visita domiciliaria",
+    case:"Una mujer de 63 años egresa del hospital por diabetes mellitus tipo 2 descontrolada. Enfermería programa visitas para verificar el cumplimiento del plan de cuidados.",
+    q:"¿Qué etapa de la visita domiciliaria se describe?",
+    options:["Valoración","Diagnóstico","Evaluación"],
+    answer:2,
+    feedback:"El material define la evaluación como la comparación del estado o resultados con los objetivos previamente establecidos."
+  }
+];
+
+let current=0, correct=0, wrong=0, timeout=0, answers=[];
+let student="", group="", timerId=null, seconds=60, answered=false;
+
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const resultScreen=document.getElementById("resultScreen");
+const timerEl=document.getElementById("timer");
+
+document.getElementById("startBtn").onclick=()=>{
+  student=document.getElementById("studentName").value.trim();
+  group=document.getElementById("group").value.trim();
+  if(!student){
+    alert("Escribe el nombre del estudiante para comenzar.");
+    document.getElementById("studentName").focus();
+    return;
+  }
+  localStorage.setItem("reto60_student",student);
+  localStorage.setItem("reto60_group",group);
+  startScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+  renderQuestion();
+};
+
+function renderQuestion(){
+  clearInterval(timerId);
+  answered=false;
+  seconds=60;
+  updateTimer();
+
+  const item=questions[current];
+  document.getElementById("studentBadge").textContent=group?`${student} · ${group}`:student;
+  document.getElementById("counter").textContent=`Reactivo ${current+1} de ${questions.length}`;
+  document.getElementById("progressBar").style.width=`${(current/questions.length)*100}%`;
+  document.getElementById("tag").textContent=item.tag;
+  document.getElementById("caseText").textContent=item.case;
+  document.getElementById("question").textContent=item.q;
+
+  const options=document.getElementById("options");
+  options.innerHTML="";
+  ["A","B","C"].forEach((letter,i)=>{
+    const b=document.createElement("button");
+    b.className="option";
+    b.innerHTML=`<b>${letter}.</b> ${item.options[i]}`;
+    b.onclick=()=>selectAnswer(i);
+    options.appendChild(b);
+  });
+
+  const fb=document.getElementById("feedback");
+  fb.className="feedback";
+  fb.innerHTML="";
+  document.getElementById("nextBtn").classList.add("hidden");
+
+  timerId=setInterval(()=>{
+    seconds--;
+    updateTimer();
+    if(seconds<=0){
+      clearInterval(timerId);
+      handleTimeout();
+    }
+  },1000);
+}
+
+function updateTimer(){
+  timerEl.textContent=`${seconds} s`;
+  timerEl.className="timer";
+  if(seconds<=15 && seconds>5) timerEl.classList.add("warn");
+  if(seconds<=5) timerEl.classList.add("danger");
+}
+
+function selectAnswer(index){
+  if(answered) return;
+  answered=true;
+  clearInterval(timerId);
+
+  const item=questions[current];
+  const buttons=[...document.querySelectorAll(".option")];
+  buttons.forEach(b=>b.disabled=true);
+
+  const ok=index===item.answer;
+  if(ok) correct++; else wrong++;
+  answers.push({index,correct:ok,timeout:false,time:60-seconds});
+
+  buttons[item.answer].classList.add("correct");
+  if(!ok) buttons[index].classList.add("wrong");
+
+  const fb=document.getElementById("feedback");
+  fb.className=`feedback show ${ok?"ok":"bad"}`;
+  fb.innerHTML=`<strong>${ok?"✅ Respuesta correcta":"❌ Respuesta incorrecta"}</strong><br>${item.feedback}<br><small>Tiempo utilizado: ${60-seconds} segundos.</small>`;
+
+  document.getElementById("progressBar").style.width=`${((current+1)/questions.length)*100}%`;
+  document.getElementById("nextBtn").classList.remove("hidden");
+}
+
+function handleTimeout(){
+  if(answered) return;
+  answered=true;
+  timeout++;
+  const item=questions[current];
+  const buttons=[...document.querySelectorAll(".option")];
+  buttons.forEach(b=>b.disabled=true);
+  buttons[item.answer].classList.add("correct");
+  answers.push({index:null,correct:false,timeout:true,time:60});
+
+  const fb=document.getElementById("feedback");
+  fb.className="feedback show time";
+  fb.innerHTML=`<strong>⏰ Tiempo agotado</strong><br>${item.feedback}<br><small>La respuesta correcta quedó marcada en verde.</small>`;
+  document.getElementById("progressBar").style.width=`${((current+1)/questions.length)*100}%`;
+  document.getElementById("nextBtn").classList.remove("hidden");
+}
+
+document.getElementById("nextBtn").onclick=()=>{
+  current++;
+  if(current<questions.length){
+    renderQuestion();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else{
+    showResults();
+  }
+};
+
+function showResults(){
+  clearInterval(timerId);
+  gameScreen.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+
+  const pct=Math.round(correct/questions.length*100);
+  const level=pct>=90?"Excelente":pct>=80?"Satisfactorio":pct>=70?"En proceso":"Reforzar";
+
+  document.getElementById("resultName").textContent=group?`${student} · Grupo/Sección: ${group}`:student;
+  document.getElementById("correctCount").textContent=correct;
+  document.getElementById("wrongCount").textContent=wrong;
+  document.getElementById("timeoutCount").textContent=timeout;
+  document.getElementById("grade").textContent=pct;
+  document.getElementById("level").textContent=level;
+  document.getElementById("scorePct").textContent=pct+"%";
+  document.getElementById("scoreRing").style.background=
+    `conic-gradient(var(--primary) 0deg,var(--primary) ${pct*3.6}deg,#e9eef4 ${pct*3.6}deg)`;
+
+  const review=document.getElementById("review");
+  review.innerHTML="<h3>Revisión de reactivos</h3>";
+  questions.forEach((q,i)=>{
+    const a=answers[i];
+    const d=document.createElement("div");
+    d.className="review-item";
+    const status=a.timeout?"⏰":a.correct?"✅":"❌";
+    const userAns=a.timeout?"Sin respuesta":q.options[a.index];
+    d.innerHTML=`
+      <b>${status} ${i+1}. ${q.q}</b><br>
+      <small>Tu respuesta: ${userAns} · Correcta: ${q.options[q.answer]} · Tiempo: ${a.time}s</small>
+      ${a.correct?"":`<div style="margin-top:6px">${q.feedback}</div>`}
+    `;
+    review.appendChild(d);
+  });
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.getElementById("restartBtn").onclick=()=>{
+  current=0;correct=0;wrong=0;timeout=0;answers=[];
+  resultScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+  document.getElementById("studentName").value=student;
+  document.getElementById("group").value=group;
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+window.addEventListener("DOMContentLoaded",()=>{
+  const s=localStorage.getItem("reto60_student");
+  const g=localStorage.getItem("reto60_group");
+  if(s) document.getElementById("studentName").value=s;
+  if(g) document.getElementById("group").value=g;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><script src="../registro-compartido.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detective Epidemiológico - EGEL Enfermería</title>
+<style>
+:root{
+  --bg:#f4f7fb; --card:#ffffff; --text:#1d2939; --muted:#667085;
+  --primary:#173f73; --primary2:#2f6fb1; --accent:#8b5cf6;
+  --ok:#16834a; --bad:#b42318; --warn:#b7791f; --line:#dfe6ee;
+  --soft:#edf4fb; --shadow:0 18px 45px rgba(23,63,115,.13);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 8% 5%, rgba(47,111,177,.13), transparent 24%),
+    radial-gradient(circle at 92% 8%, rgba(139,92,246,.09), transparent 24%),
+    var(--bg);
+}
+.wrap{max-width:1020px;margin:auto;padding:28px 16px 60px}
+.hero{
+  background:linear-gradient(135deg,#173f73,#315f96);
+  color:#fff;border-radius:28px;padding:28px;box-shadow:var(--shadow);
+  position:relative;overflow:hidden
+}
+.hero:after{
+  content:"🕵️";position:absolute;right:24px;top:10px;font-size:98px;opacity:.12
+}
+.hero h1{margin:0 0 6px;font-size:clamp(29px,5vw,45px)}
+.hero p{margin:5px 0;color:#e9f1fb}
+.hero .author{font-weight:900;margin-top:12px}
+.card{
+  background:var(--card);border:1px solid #edf1f6;border-radius:22px;
+  padding:23px;margin-top:22px;box-shadow:var(--shadow)
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:800;font-size:14px;margin-bottom:7px}
+input{
+  width:100%;padding:14px;border:1px solid var(--line);border-radius:14px;
+  font-size:16px;outline:none
+}
+input:focus{border-color:var(--primary2);box-shadow:0 0 0 4px rgba(47,111,177,.12)}
+.btn{
+  border:0;border-radius:14px;padding:13px 18px;font-size:15px;font-weight:900;
+  cursor:pointer;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:8px
+}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--primary);color:white}
+.btn-soft{background:var(--soft);color:var(--primary)}
+.btn-ghost{background:white;border:1px solid var(--line);color:var(--text)}
+.actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px}
+.hidden{display:none!important}
+.topbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.badge{padding:8px 12px;border-radius:999px;background:var(--soft);color:var(--primary);font-size:13px;font-weight:900}
+.progress{height:11px;background:#e9eef4;border-radius:999px;overflow:hidden;margin:14px 0 20px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,#2f6fb1,#8b5cf6);transition:.25s}
+.casebox{
+  border:1px solid #e4eaf1;background:#f9fbfd;border-radius:18px;padding:18px
+}
+.casebox .tag{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:var(--primary)}
+.casebox h2{margin:7px 0 9px;font-size:23px}
+.casebox p{margin:0;line-height:1.55}
+.clues{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.clue{
+  border:1px solid #dde5ee;border-radius:15px;padding:13px;background:#fff;
+  min-height:95px
+}
+.clue b{display:block;color:var(--primary);margin-bottom:5px}
+.clue span{font-size:14px;line-height:1.4}
+.question{font-size:19px;font-weight:900;margin:18px 0 12px}
+.options{display:grid;gap:11px}
+.option{
+  width:100%;text-align:left;border:2px solid #e2e8f0;background:white;border-radius:15px;
+  padding:14px 15px;font-weight:800;font-size:15px;cursor:pointer;color:var(--text)
+}
+.option:hover{border-color:#a9c3de;background:#f8fbff}
+.option.correct{border-color:#65c88f;background:#effaf3;color:#145f38}
+.option.wrong{border-color:#ea9a94;background:#fff3f2;color:#8b211b}
+.option:disabled{cursor:default}
+.feedback{display:none;margin-top:17px;padding:16px;border-radius:16px;line-height:1.55}
+.feedback.show{display:block}
+.feedback.ok{background:#edf9f1;border:1px solid #b9e6ca;color:#155f37}
+.feedback.bad{background:#fff4f2;border:1px solid #f0bbb6;color:#8a241e}
+.investigation{
+  margin-top:12px;background:#fff;border-left:5px solid var(--accent);padding:11px 13px;border-radius:10px
+}
+.result{text-align:center}
+.score{
+  width:150px;height:150px;border-radius:50%;display:grid;place-items:center;margin:12px auto 18px;
+  position:relative;background:conic-gradient(var(--primary) 0deg,#e9eef4 0deg)
+}
+.score:after{content:"";position:absolute;inset:13px;background:#fff;border-radius:50%}
+.score span{position:relative;z-index:2;font-size:30px;font-weight:900}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.stat{border:1px solid var(--line);border-radius:15px;padding:14px;background:#fbfcfe}
+.stat b{display:block;font-size:22px;color:var(--primary)}
+.review{text-align:left;margin-top:20px}
+.review-item{padding:13px 0;border-top:1px solid var(--line)}
+.review-item:first-child{border-top:0}
+.review-item small{color:var(--muted)}
+.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+.note{color:var(--muted);line-height:1.5}
+@media(max-width:760px){
+  .grid2,.clues,.stats{grid-template-columns:1fr}
+  .hero,.card{padding:18px}
+}
+@media print{
+  body{background:white}
+  .hero,.card{box-shadow:none}
+  #startScreen,#gameScreen,.no-print{display:none!important}
+  #resultScreen{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>🕵️ Detective epidemiológico</h1>
+    <p><b>Actividad 4 · EGEL-Enfermería</b></p>
+    <p>Analiza pistas, identifica el problema prioritario y selecciona la mejor decisión.</p>
+    <p class="author">Elaboró: Alejandro Torres Reyes</p>
+  </section>
+
+  <section id="startScreen" class="card">
+    <h2 style="margin-top:0">Registro del estudiante</h2>
+    <p class="note">
+      En cada expediente encontrarás tres pistas. Tu misión es identificar el problema o la respuesta
+      más congruente con los datos del caso. Recibirás retroalimentación inmediata y una calificación final.
+    </p>
+    <div class="grid2">
+      <div>
+        <label>Nombre del estudiante</label>
+        <input id="studentName" placeholder="Nombre completo">
+      </div>
+      <div>
+        <label>Grupo / Sección</label>
+        <input id="group" placeholder="Ej. 8° A">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="startBtn">Abrir expediente 1 →</button>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="card hidden">
+    <div class="topbar">
+      <div class="badge" id="studentBadge"></div>
+      <div class="badge" id="counter"></div>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+
+    <div class="casebox">
+      <div class="tag" id="tag"></div>
+      <h2 id="title"></h2>
+      <p id="caseIntro"></p>
+
+      <div class="clues" id="clues"></div>
+    </div>
+
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="actions">
+      <button class="btn btn-primary hidden" id="nextBtn">Siguiente expediente →</button>
+    </div>
+  </section>
+
+  <section id="resultScreen" class="card result hidden">
+    <div class="badge">Autoevaluación final</div>
+    <h2>Informe del detective</h2>
+    <p id="resultName"></p>
+
+    <div class="score" id="scoreRing"><span id="scorePct">0%</span></div>
+
+    <div class="stats">
+      <div class="stat"><b id="correctCount">0</b><span>Aciertos</span></div>
+      <div class="stat"><b id="wrongCount">0</b><span>Errores</span></div>
+      <div class="stat"><b id="grade">0</b><span>Calificación /100</span></div>
+      <div class="stat"><b id="level">—</b><span>Nivel</span></div>
+    </div>
+
+    <div class="review" id="review"></div>
+
+    <div class="actions no-print">
+      <button class="btn btn-soft" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <button class="btn btn-primary" id="restartBtn">↻ Reiniciar investigación</button>
+    </div>
+  </section>
+
+  <div class="footer">EGEL-Enfermería · Actividad interactiva · Elaboró: Alejandro Torres Reyes</div>
+</div>
+
+<script>
+const cases = [
+  {
+    tag:"Expediente comunitario",
+    title:"Caso 1 · ¿Qué entorno es más saludable?",
+    intro:"Una jurisdicción sanitaria realiza un diagnóstico general en una comunidad de 11 000 habitantes.",
+    clues:[
+      ["Pista 1","Solo 30% de las aguas residuales recibe tratamiento adecuado."],
+      ["Pista 2","La seguridad alimentaria es moderada en 15%."],
+      ["Pista 3","La contaminación atmosférica es de 10 µg/m³."]
+    ],
+    question:"¿Qué aspecto refleja un entorno saludable en este caso?",
+    options:["Seguridad alimentaria","Calidad de las fuentes de agua","Condición atmosférica"],
+    answer:2,
+    explanation:"En la argumentación del material, la condición atmosférica de 10 µg/m³ se considera dentro del límite señalado, mientras que el agua y la seguridad alimentaria presentan condiciones desfavorables."
+  },
+  {
+    tag:"Expediente de salud de la mujer",
+    title:"Caso 2 · Riesgo reproductivo",
+    intro:"Durante un microdiagnóstico familiar se identifican mujeres embarazadas mayores de 35 años, algunas sin vigilancia prenatal.",
+    clues:[
+      ["Pista 1","18 mujeres embarazadas tienen más de 35 años."],
+      ["Pista 2","Seis no acuden a control prenatal."],
+      ["Pista 3","Existe consumo de alcohol y tabaco en la población adulta."]
+    ],
+    question:"¿Qué programa debe priorizarse para mujeres de 20 a 59 años?",
+    options:[
+      "Promoción de la salud bucal",
+      "Salud sexual y reproductiva, promoción y otorgamiento de métodos anticonceptivos",
+      "Salud sexual y reproductiva, alimentación"
+    ],
+    answer:1,
+    explanation:"El material relaciona el embarazo después de los 35 años con mayor riesgo y destaca la vigilancia prenatal y los métodos anticonceptivos para retrasar o espaciar embarazos."
+  },
+  {
+    tag:"Expediente geriátrico",
+    title:"Caso 3 · Fracturas de cadera",
+    intro:"Una enfermera comunitaria identifica problemas frecuentes en adultos mayores de una comunidad rural.",
+    clues:[
+      ["Pista 1","40% presenta fracturas de cadera."],
+      ["Pista 2","60% presenta anemia por falta de hierro."],
+      ["Pista 3","35% de las mujeres refiere diagnóstico de cáncer cervicouterino."]
+    ],
+    question:"¿Qué programa específico para adultos mayores debe implementarse?",
+    options:["Evaluación del estado nutricional","Detección y tratamiento de osteoporosis","Prevención y control de cáncer cervicouterino"],
+    answer:1,
+    explanation:"El caso del material vincula la alta frecuencia de fracturas de cadera con la necesidad de detección y tratamiento de osteoporosis."
+  },
+  {
+    tag:"Expediente de programa de salud",
+    title:"Caso 4 · Objetivo, indicador o línea de acción",
+    intro:"Un programa de diabetes busca incrementar la cobertura de pacientes en control.",
+    clues:[
+      ["Pista 1","Se pretende medir HbA1c al menos una vez al año."],
+      ["Pista 2","Se otorgará orientación-consejería para autocuidado."],
+      ["Pista 3","Se promoverá orientación nutricional y actividad física."]
+    ],
+    question:"¿Qué componente representa la acción 'promover orientación nutricional y actividad física'?",
+    options:["Objetivo","Indicador","Línea de acción"],
+    answer:2,
+    explanation:"El material define la línea de acción como las acciones específicas que permiten cumplir el objetivo general."
+  },
+  {
+    tag:"Expediente de participación social",
+    title:"Caso 5 · Organización de la comunidad",
+    intro:"La población se reúne para nombrar representantes que comuniquen sus necesidades de salud.",
+    clues:[
+      ["Pista 1","70% solicita mayor cercanía del servicio médico."],
+      ["Pista 2","100% exige áreas verdes y de esparcimiento."],
+      ["Pista 3","Los representantes gestionarán las necesidades ante las áreas correspondientes."]
+    ],
+    question:"¿Qué tipo de participación social está presente?",
+    options:["Asociación de usuarios","Veedurías ciudadanas en salud","Comités de participación comunitaria"],
+    answer:2,
+    explanation:"El material describe a los comités de participación comunitaria como órganos de representación ciudadana de los intereses colectivos ante las autoridades."
+  },
+  {
+    tag:"Expediente ambiental",
+    title:"Caso 6 · Agua y saneamiento",
+    intro:"En una comunidad rural, las enfermedades diarreicas asociadas con falta de higiene continúan afectando a menores de cinco años.",
+    clues:[
+      ["Pista 1","Las enfermedades relacionadas con agua y saneamiento siguen causando fallecimientos."],
+      ["Pista 2","Se requiere mejorar higiene y saneamiento."],
+      ["Pista 3","La meta se relaciona con el Objetivo de Desarrollo Sostenible 6."]
+    ],
+    question:"¿Qué meta corresponde de manera más directa al saneamiento e higiene adecuados y equitativos?",
+    options:["Uso eficiente de los recursos hídricos","Acceso al saneamiento equitativo","Mejora de la calidad del agua"],
+    answer:1,
+    explanation:"El material cita la meta 6.2 del ODS 6, orientada al acceso a servicios de saneamiento e higiene adecuados y equitativos para todos."
+  },
+  {
+    tag:"Expediente metabólico",
+    title:"Caso 7 · Diabetes mellitus",
+    intro:"Un paciente presenta polidipsia, poliuria y polifagia y se revisan sus estudios de laboratorio.",
+    clues:[
+      ["Pista 1","HbA1c = 7%."],
+      ["Pista 2","Glucosa plasmática en ayuno < 100 mg/dL."],
+      ["Pista 3","LDL = 80 mg/dL."]
+    ],
+    question:"¿Qué dato es el indicador para el diagnóstico oportuno de diabetes mellitus?",
+    options:["HbA1c de 7%","Glucosa en ayuno < 100 mg/dL","LDL de 80 mg/dL"],
+    answer:0,
+    explanation:"El material establece que una HbA1c de 6.5% o mayor señala diabetes; por ello, 7% es el hallazgo determinante entre las opciones."
+  },
+  {
+    tag:"Expediente de educación en salud",
+    title:"Caso 8 · Prevención de enfermedades diarreicas",
+    intro:"En un municipio se registran numerosos casos de enfermedades digestivas infecciosas y parasitarias, especialmente en población de 0 a 10 años.",
+    clues:[
+      ["Pista 1","La gastroenteritis concentra una gran proporción de casos."],
+      ["Pista 2","La población infantil es la más afectada."],
+      ["Pista 3","El lavado de manos puede reducir episodios de diarrea."]
+    ],
+    question:"¿Qué estrategia educativa se debe implementar?",
+    options:[
+      "Realizar recomendaciones para la limpieza de las viviendas",
+      "Establecer mecanismos de higiene general",
+      "Educar de manera colectiva la correcta higiene de las manos"
+    ],
+    answer:2,
+    explanation:"El material recomienda la educación colectiva sobre la correcta higiene de manos y señala su utilidad para reducir el riesgo de diarrea."
+  },
+  {
+    tag:"Expediente de visita domiciliaria",
+    title:"Caso 9 · Seguimiento del plan de cuidados",
+    intro:"Una mujer de 63 años egresa del hospital tras un episodio de diabetes mellitus tipo 2 descontrolada.",
+    clues:[
+      ["Pista 1","Enfermería programa visitas domiciliarias."],
+      ["Pista 2","Se verificará el cumplimiento de acciones y objetivos."],
+      ["Pista 3","Se busca asegurar que el plan de cuidados se cumpla."]
+    ],
+    question:"¿Qué etapa de la visita domiciliaria se describe?",
+    options:["Valoración","Diagnóstico","Evaluación"],
+    answer:2,
+    explanation:"En el material, la evaluación implica contrastar los resultados obtenidos con los objetivos previamente establecidos."
+  },
+  {
+    tag:"Expediente de proceso enfermero",
+    title:"Caso 10 · Datos objetivos y subjetivos",
+    intro:"Un paciente presenta sensación de falta de aire, dolor y frecuencia respiratoria de 10/min.",
+    clues:[
+      ["Pista 1","El dolor es referido por el paciente."],
+      ["Pista 2","La sensación de falta de aire también es percibida por el paciente."],
+      ["Pista 3","La frecuencia respiratoria puede medirse."]
+    ],
+    question:"¿Qué dato es objetivo?",
+    options:["Sensación de falta de aire","Dolor","Frecuencia respiratoria"],
+    answer:2,
+    explanation:"El material identifica los signos vitales medibles, como la frecuencia respiratoria, como datos objetivos; dolor y sensación de falta de aire son subjetivos."
+  }
+];
+
+let current=0, correct=0, answers=[];
+let student="", group="";
+
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const resultScreen=document.getElementById("resultScreen");
+
+document.getElementById("startBtn").onclick=()=>{
+  student=document.getElementById("studentName").value.trim();
+  group=document.getElementById("group").value.trim();
+  if(!student){
+    alert("Escribe el nombre del estudiante para comenzar.");
+    document.getElementById("studentName").focus();
+    return;
+  }
+  localStorage.setItem("detective_student",student);
+  localStorage.setItem("detective_group",group);
+  startScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+  renderCase();
+};
+
+function renderCase(){
+  const c=cases[current];
+  document.getElementById("studentBadge").textContent=group?`${student} · ${group}`:student;
+  document.getElementById("counter").textContent=`Expediente ${current+1} de ${cases.length}`;
+  document.getElementById("progressBar").style.width=`${(current/cases.length)*100}%`;
+  document.getElementById("tag").textContent=c.tag;
+  document.getElementById("title").textContent=c.title;
+  document.getElementById("caseIntro").textContent=c.intro;
+  document.getElementById("question").textContent=c.question;
+
+  const clues=document.getElementById("clues");
+  clues.innerHTML="";
+  c.clues.forEach(cl=>{
+    const d=document.createElement("div");
+    d.className="clue";
+    d.innerHTML=`<b>🔎 ${cl[0]}</b><span>${cl[1]}</span>`;
+    clues.appendChild(d);
+  });
+
+  const options=document.getElementById("options");
+  options.innerHTML="";
+  const letters=["A","B","C"];
+  c.options.forEach((opt,i)=>{
+    const b=document.createElement("button");
+    b.className="option";
+    b.innerHTML=`<b>${letters[i]}.</b> ${opt}`;
+    b.onclick=()=>answer(i);
+    options.appendChild(b);
+  });
+
+  const fb=document.getElementById("feedback");
+  fb.className="feedback";
+  fb.innerHTML="";
+  document.getElementById("nextBtn").classList.add("hidden");
+}
+
+function answer(index){
+  const c=cases[current];
+  const buttons=[...document.querySelectorAll(".option")];
+  buttons.forEach(b=>b.disabled=true);
+
+  const ok=index===c.answer;
+  if(ok) correct++;
+  answers.push({index,correct:ok});
+
+  buttons[c.answer].classList.add("correct");
+  if(!ok) buttons[index].classList.add("wrong");
+
+  const fb=document.getElementById("feedback");
+  fb.className=`feedback show ${ok?"ok":"bad"}`;
+  fb.innerHTML=`
+    <strong>${ok?"✅ Expediente resuelto":"❌ Hipótesis incorrecta"}</strong>
+    <div class="investigation"><b>Conclusión:</b> ${c.explanation}</div>
+  `;
+  document.getElementById("progressBar").style.width=`${((current+1)/cases.length)*100}%`;
+  document.getElementById("nextBtn").classList.remove("hidden");
+}
+
+document.getElementById("nextBtn").onclick=()=>{
+  current++;
+  if(current<cases.length){
+    renderCase();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else showResults();
+};
+
+function showResults(){
+  gameScreen.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+
+  const pct=Math.round(correct/cases.length*100);
+  const wrong=cases.length-correct;
+  const level=pct>=90?"Excelente":pct>=80?"Satisfactorio":pct>=70?"En proceso":"Reforzar";
+
+  document.getElementById("resultName").textContent=group?`${student} · Grupo/Sección: ${group}`:student;
+  document.getElementById("correctCount").textContent=correct;
+  document.getElementById("wrongCount").textContent=wrong;
+  document.getElementById("grade").textContent=pct;
+  document.getElementById("level").textContent=level;
+  document.getElementById("scorePct").textContent=pct+"%";
+  document.getElementById("scoreRing").style.background=
+    `conic-gradient(var(--primary) 0deg,var(--primary) ${pct*3.6}deg,#e9eef4 ${pct*3.6}deg)`;
+
+  const review=document.getElementById("review");
+  review.innerHTML="<h3>Revisión de expedientes</h3>";
+  cases.forEach((c,i)=>{
+    const a=answers[i];
+    const div=document.createElement("div");
+    div.className="review-item";
+    div.innerHTML=`
+      <b>${a.correct?"✅":"❌"} ${i+1}. ${c.title}</b><br>
+      <small>Tu respuesta: ${c.options[a.index]} · Correcta: ${c.options[c.answer]}</small>
+      ${a.correct?"":`<div style="margin-top:6px">${c.explanation}</div>`}
+    `;
+    review.appendChild(div);
+  });
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.getElementById("restartBtn").onclick=()=>{
+  current=0;correct=0;answers=[];
+  resultScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+  document.getElementById("studentName").value=student;
+  document.getElementById("group").value=group;
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+window.addEventListener("DOMContentLoaded",()=>{
+  const s=localStorage.getItem("detective_student");
+  const g=localStorage.getItem("detective_group");
+  if(s) document.getElementById("studentName").value=s;
+  if(g) document.getElementById("group").value=g;
+});
+</script>
+</body>
+</html>

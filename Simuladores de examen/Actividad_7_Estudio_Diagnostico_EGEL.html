@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><script src="../registro-compartido.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Qué estudio diagnóstico solicitarías? - EGEL Enfermería</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --text:#1f2937; --muted:#667085;
+  --primary:#1f4f8a; --primary2:#2f6fb1; --ok:#16834a; --bad:#b42318;
+  --warn:#b7791f; --line:#dfe6ee; --soft:#eef4fb; --shadow:0 18px 45px rgba(31,79,138,.12);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 8% 5%,rgba(47,111,177,.13),transparent 24%),
+    radial-gradient(circle at 92% 8%,rgba(31,79,138,.10),transparent 24%),
+    var(--bg);
+}
+.wrap{max-width:980px;margin:auto;padding:28px 16px 60px}
+.hero{
+  background:linear-gradient(135deg,#173f73,#2f6fb1);
+  color:#fff;border-radius:28px;padding:28px;box-shadow:var(--shadow);
+  position:relative;overflow:hidden
+}
+.hero:after{content:"🩺";position:absolute;right:24px;top:10px;font-size:98px;opacity:.13}
+.hero h1{margin:0 0 7px;font-size:clamp(28px,5vw,44px)}
+.hero p{margin:5px 0;color:#e9f1fb}
+.hero .author{font-weight:900;margin-top:12px}
+.card{
+  background:var(--card);border:1px solid #edf1f6;border-radius:22px;
+  padding:23px;margin-top:22px;box-shadow:var(--shadow)
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:800;font-size:14px;margin-bottom:7px}
+input{
+  width:100%;padding:14px;border:1px solid var(--line);border-radius:14px;
+  font-size:16px;outline:none
+}
+input:focus{border-color:var(--primary2);box-shadow:0 0 0 4px rgba(47,111,177,.12)}
+.btn{
+  border:0;border-radius:14px;padding:13px 18px;font-size:15px;font-weight:900;
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-soft{background:var(--soft);color:var(--primary)}
+.actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px}
+.hidden{display:none!important}
+.badge{
+  display:inline-block;padding:8px 12px;border-radius:999px;background:var(--soft);
+  color:var(--primary);font-size:13px;font-weight:900
+}
+.topbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.progress{height:11px;background:#e9eef4;border-radius:999px;overflow:hidden;margin:14px 0 20px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,#2f6fb1,#6aa2da);transition:.25s}
+.case{
+  background:#f9fbfd;border:1px solid #e4ebf2;border-radius:18px;padding:18px
+}
+.case .tag{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:var(--primary)}
+.case h2{margin:8px 0 8px;font-size:22px}
+.case p{margin:0;line-height:1.55}
+.question{font-size:20px;font-weight:900;line-height:1.4;margin:18px 0 12px}
+.options{display:grid;gap:11px}
+.option{
+  width:100%;text-align:left;border:2px solid #e2e8f0;background:#fff;border-radius:15px;
+  padding:14px 15px;font-weight:800;font-size:15px;cursor:pointer;color:var(--text)
+}
+.option:hover{border-color:#aac4df;background:#f8fbff}
+.option.correct{border-color:#65c88f;background:#effaf3;color:#145f38}
+.option.wrong{border-color:#ea9a94;background:#fff3f2;color:#8b211b}
+.option:disabled{cursor:default}
+.feedback{display:none;margin-top:18px;padding:16px;border-radius:16px;line-height:1.55}
+.feedback.show{display:block}
+.feedback.ok{background:#eefaf3;border:1px solid #bce7cc;color:#16613a}
+.feedback.bad{background:#fff4f2;border:1px solid #efbbb6;color:#8a251f}
+.pearl{
+  margin-top:10px;padding:10px 12px;border-left:5px solid var(--primary2);
+  background:#f7fbff;border-radius:10px
+}
+.result{text-align:center}
+.score{
+  width:150px;height:150px;border-radius:50%;display:grid;place-items:center;margin:12px auto 18px;
+  position:relative;background:conic-gradient(var(--primary) 0deg,#e9eef4 0deg)
+}
+.score:after{content:"";position:absolute;inset:13px;background:#fff;border-radius:50%}
+.score span{position:relative;z-index:2;font-size:30px;font-weight:900}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.stat{border:1px solid var(--line);border-radius:15px;padding:14px;background:#fbfcfe}
+.stat b{display:block;font-size:22px;color:var(--primary)}
+.review{text-align:left;margin-top:20px}
+.review-item{padding:13px 0;border-top:1px solid var(--line)}
+.review-item:first-child{border-top:0}
+.review-item small{color:var(--muted)}
+.note{color:var(--muted);line-height:1.55}
+.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:760px){
+  .grid2,.stats{grid-template-columns:1fr}
+  .hero,.card{padding:18px}
+}
+@media print{
+  body{background:#fff}
+  .hero,.card{box-shadow:none}
+  #startScreen,#gameScreen,.no-print{display:none!important}
+  #resultScreen{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>🩺 ¿Qué estudio diagnóstico solicitarías?</h1>
+    <p><b>Actividad 7 · EGEL-Enfermería</b></p>
+    <p>Selecciona la prueba o estudio más congruente con cada caso.</p>
+    <p class="author">Elaboró: Alejandro Torres Reyes</p>
+  </section>
+
+  <section id="startScreen" class="card">
+    <h2 style="margin-top:0">Registro del estudiante</h2>
+    <p class="note">
+      Analiza cada caso clínico y selecciona el estudio diagnóstico o criterio que corresponde según el material revisado.
+      Al responder recibirás retroalimentación inmediata y una autoevaluación final.
+    </p>
+    <div class="grid2">
+      <div>
+        <label>Nombre del estudiante</label>
+        <input id="studentName" placeholder="Nombre completo">
+      </div>
+      <div>
+        <label>Grupo / Sección</label>
+        <input id="group" placeholder="Ej. 8° A">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="startBtn">Comenzar actividad →</button>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="card hidden">
+    <div class="topbar">
+      <div class="badge" id="studentBadge"></div>
+      <div class="badge" id="counter"></div>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+
+    <div class="case">
+      <div class="tag" id="tag"></div>
+      <h2 id="title"></h2>
+      <p id="caseText"></p>
+    </div>
+
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div id="feedback" class="feedback"></div>
+
+    <div class="actions">
+      <button class="btn btn-primary hidden" id="nextBtn">Siguiente caso →</button>
+    </div>
+  </section>
+
+  <section id="resultScreen" class="card result hidden">
+    <div class="badge">Autoevaluación final</div>
+    <h2>Resultado de la actividad</h2>
+    <p id="resultName"></p>
+
+    <div class="score" id="scoreRing"><span id="scorePct">0%</span></div>
+
+    <div class="stats">
+      <div class="stat"><b id="correctCount">0</b><span>Aciertos</span></div>
+      <div class="stat"><b id="wrongCount">0</b><span>Errores</span></div>
+      <div class="stat"><b id="grade">0</b><span>Calificación /100</span></div>
+      <div class="stat"><b id="level">—</b><span>Nivel</span></div>
+    </div>
+
+    <div class="review" id="review"></div>
+
+    <div class="actions no-print">
+      <button class="btn btn-soft" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <button class="btn btn-primary" id="restartBtn">↻ Intentar nuevamente</button>
+    </div>
+  </section>
+
+  <div class="footer">EGEL-Enfermería · Actividad interactiva · Elaboró: Alejandro Torres Reyes</div>
+</div>
+
+<script>
+const questions = [
+  {
+    tag:"Próstata",
+    title:"Caso 1 · Síntomas urinarios",
+    case:"Paciente de 67 años con dolor pélvico, nicturia, dificultad para orinar, goteo postmiccional, hematuria y antecedentes de obstrucción progresiva durante la micción.",
+    q:"¿Qué estudio se plantea en el material para el diagnóstico oportuno?",
+    options:["Tacto rectal","Radiografía de pelvis","Antígeno prostático específico (PSA)"],
+    answer:2,
+    feedback:"El material describe la prueba de PSA como un análisis de sangre que mide el antígeno prostático específico y que se utiliza para detectar cáncer de próstata."
+  },
+  {
+    tag:"Diabetes mellitus",
+    title:"Caso 2 · Síntomas clásicos",
+    case:"Paciente con polidipsia, poliuria y polifagia. Presenta HbA1c de 7%, glucosa plasmática en ayuno menor de 100 mg/dL y LDL de 80 mg/dL.",
+    q:"¿Qué dato funciona como indicador para el diagnóstico oportuno de diabetes?",
+    options:["HbA1c de 7%","Glucosa en ayuno < 100 mg/dL","LDL de 80 mg/dL"],
+    answer:0,
+    feedback:"En el material, una HbA1c de 6.5% o mayor indica diabetes. Por ello, 7% es el dato diagnóstico entre las opciones."
+  },
+  {
+    tag:"Diabetes mellitus",
+    title:"Caso 3 · Método diagnóstico",
+    case:"Paciente con malestar general, poliuria, polidipsia, polifagia, dieta mal controlada y pérdida paulatina de la visión. Se sospecha diabetes.",
+    q:"¿Cuál es el método diagnóstico oportuno señalado en el caso?",
+    options:["Glucosa plasmática en ayuno de 100 mg/dL","Hemoglobina glicosilada de 8%","Glucosa plasmática de 150 mg/dL a las 2 horas"],
+    answer:1,
+    feedback:"El material señala que una HbA1c de 6.5% o mayor indica diabetes; por tanto, 8% es el resultado compatible con el diagnóstico."
+  },
+  {
+    tag:"Prueba de tolerancia a la glucosa",
+    title:"Caso 4 · Interpretación de resultado",
+    case:"Se realiza una prueba de tolerancia a la glucosa y se obtiene una glucosa plasmática de 150 mg/dL a las 2 horas.",
+    q:"Según los rangos presentados en el material, ¿cómo se interpreta este resultado?",
+    options:["Normal","Prediabetes","Diabetes"],
+    answer:1,
+    feedback:"El material establece que a las 2 horas: 140 mg/dL o menos se considera normal, 140 a 199 mg/dL indica prediabetes y 200 mg/dL o más indica diabetes."
+  },
+  {
+    tag:"Glucosa en ayuno",
+    title:"Caso 5 · Interpretación de glucosa",
+    case:"Una persona obtiene una glucosa plasmática en ayuno de 126 mg/dL.",
+    q:"Según los rangos incluidos en el material, ¿qué interpretación corresponde?",
+    options:["Normal","Prediabetes","Diabetes"],
+    answer:2,
+    feedback:"El material indica que una glucosa en ayuno de 126 mg/dL o mayor corresponde a diabetes."
+  },
+  {
+    tag:"Cáncer cervicouterino",
+    title:"Caso 6 · Virus del Papiloma Humano",
+    case:"Una paciente requiere una prueba que determine si existe un tipo de Virus del Papiloma Humano de alto riesgo oncogénico.",
+    q:"¿Qué estudio corresponde?",
+    options:["Tipificación de VPH","Citología cervical","Colposcopia"],
+    answer:0,
+    feedback:"El material define la tipificación del VPH como una prueba que determina si el virus es de alto riesgo oncogénico y puede producir cáncer de cuello uterino."
+  },
+  {
+    tag:"Cáncer cervicouterino",
+    title:"Caso 7 · Lesiones precursoras",
+    case:"Se requiere obtener una muestra de vagina y cuello uterino para detectar lesiones precursoras o cáncer del cuello uterino.",
+    q:"¿Qué estudio corresponde a esta descripción?",
+    options:["Tipificación de VPH","Citología cervicovaginal","Colposcopia"],
+    answer:1,
+    feedback:"El material describe la citología cervicovaginal como la toma de una muestra de vagina y cuello uterino para el diagnóstico de lesiones precursoras o cáncer."
+  },
+  {
+    tag:"Cáncer cervicouterino",
+    title:"Caso 8 · Evaluación posterior a un Papanicolaou anormal",
+    case:"Una paciente presenta un resultado anormal en el examen de Papanicolaou y requiere una exploración detallada del cuello uterino, vagina y vulva.",
+    q:"¿Qué procedimiento corresponde?",
+    options:["Tipificación de VPH","Citología cervical","Colposcopia"],
+    answer:2,
+    feedback:"El material señala que la colposcopia permite examinar detenidamente el cuello uterino, la vagina y la vulva, y puede recomendarse cuando el Papanicolaou es anormal."
+  },
+  {
+    tag:"HbA1c",
+    title:"Caso 9 · Promedio de glucosa",
+    case:"Se desea conocer el nivel promedio de glucosa en sangre de los últimos dos o tres meses.",
+    q:"¿Qué prueba proporciona esta información?",
+    options:["Hemoglobina glicosilada (HbA1c)","LDL","Radiografía de pelvis"],
+    answer:0,
+    feedback:"El material indica que la HbA1c mide el nivel promedio de glucosa en sangre durante los dos o tres meses anteriores."
+  },
+  {
+    tag:"Próstata",
+    title:"Caso 10 · Prueba sanguínea",
+    case:"Se requiere un análisis de sangre que mida una proteína producida por la próstata como parte de la detección de cáncer prostático.",
+    q:"¿Qué prueba corresponde?",
+    options:["PSA","Citología cervical","Prueba de tolerancia a la glucosa"],
+    answer:0,
+    feedback:"El material identifica el PSA o antígeno prostático específico como una proteína producida por la próstata que se mide mediante un análisis de sangre."
+  }
+];
+
+let current=0, correct=0, answers=[];
+let student="", group="";
+
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const resultScreen=document.getElementById("resultScreen");
+
+document.getElementById("startBtn").onclick=()=>{
+  student=document.getElementById("studentName").value.trim();
+  group=document.getElementById("group").value.trim();
+
+  if(!student){
+    alert("Escribe el nombre del estudiante para comenzar.");
+    document.getElementById("studentName").focus();
+    return;
+  }
+
+  localStorage.setItem("diag_student",student);
+  localStorage.setItem("diag_group",group);
+
+  startScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+  renderQuestion();
+};
+
+function renderQuestion(){
+  const item=questions[current];
+  document.getElementById("studentBadge").textContent=group?`${student} · ${group}`:student;
+  document.getElementById("counter").textContent=`Caso ${current+1} de ${questions.length}`;
+  document.getElementById("progressBar").style.width=`${(current/questions.length)*100}%`;
+  document.getElementById("tag").textContent=item.tag;
+  document.getElementById("title").textContent=item.title;
+  document.getElementById("caseText").textContent=item.case;
+  document.getElementById("question").textContent=item.q;
+
+  const options=document.getElementById("options");
+  options.innerHTML="";
+  ["A","B","C"].forEach((letter,i)=>{
+    const b=document.createElement("button");
+    b.className="option";
+    b.innerHTML=`<b>${letter}.</b> ${item.options[i]}`;
+    b.onclick=()=>selectAnswer(i);
+    options.appendChild(b);
+  });
+
+  const fb=document.getElementById("feedback");
+  fb.className="feedback";
+  fb.innerHTML="";
+  document.getElementById("nextBtn").classList.add("hidden");
+}
+
+function selectAnswer(index){
+  const item=questions[current];
+  const buttons=[...document.querySelectorAll(".option")];
+  buttons.forEach(b=>b.disabled=true);
+
+  const ok=index===item.answer;
+  if(ok) correct++;
+  answers.push({index,correct:ok});
+
+  buttons[item.answer].classList.add("correct");
+  if(!ok) buttons[index].classList.add("wrong");
+
+  const fb=document.getElementById("feedback");
+  fb.className=`feedback show ${ok?"ok":"bad"}`;
+  fb.innerHTML=`
+    <strong>${ok?"✅ Respuesta correcta":"❌ Respuesta incorrecta"}</strong>
+    <div class="pearl"><b>Fundamento:</b> ${item.feedback}</div>
+  `;
+
+  document.getElementById("progressBar").style.width=`${((current+1)/questions.length)*100}%`;
+  document.getElementById("nextBtn").classList.remove("hidden");
+}
+
+document.getElementById("nextBtn").onclick=()=>{
+  current++;
+  if(current<questions.length){
+    renderQuestion();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else{
+    showResults();
+  }
+};
+
+function showResults(){
+  gameScreen.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+
+  const pct=Math.round(correct/questions.length*100);
+  const wrong=questions.length-correct;
+  const level=pct>=90?"Excelente":pct>=80?"Satisfactorio":pct>=70?"En proceso":"Reforzar";
+
+  document.getElementById("resultName").textContent=group?`${student} · Grupo/Sección: ${group}`:student;
+  document.getElementById("correctCount").textContent=correct;
+  document.getElementById("wrongCount").textContent=wrong;
+  document.getElementById("grade").textContent=pct;
+  document.getElementById("level").textContent=level;
+  document.getElementById("scorePct").textContent=pct+"%";
+  document.getElementById("scoreRing").style.background=
+    `conic-gradient(var(--primary) 0deg,var(--primary) ${pct*3.6}deg,#e9eef4 ${pct*3.6}deg)`;
+
+  const review=document.getElementById("review");
+  review.innerHTML="<h3>Revisión de casos</h3>";
+
+  questions.forEach((q,i)=>{
+    const a=answers[i];
+    const d=document.createElement("div");
+    d.className="review-item";
+    d.innerHTML=`
+      <b>${a.correct?"✅":"❌"} ${i+1}. ${q.title}</b><br>
+      <small>Tu respuesta: ${q.options[a.index]} · Correcta: ${q.options[q.answer]}</small>
+      ${a.correct?"":`<div style="margin-top:6px">${q.feedback}</div>`}
+    `;
+    review.appendChild(d);
+  });
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.getElementById("restartBtn").onclick=()=>{
+  current=0; correct=0; answers=[];
+  resultScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+  document.getElementById("studentName").value=student;
+  document.getElementById("group").value=group;
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+window.addEventListener("DOMContentLoaded",()=>{
+  const s=localStorage.getItem("diag_student");
+  const g=localStorage.getItem("diag_group");
+  if(s) document.getElementById("studentName").value=s;
+  if(g) document.getElementById("group").value=g;
+});
+</script>
+</body>
+</html>

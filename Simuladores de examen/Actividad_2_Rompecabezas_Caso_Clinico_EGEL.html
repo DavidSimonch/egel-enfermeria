@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><script src="../registro-compartido.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rompecabezas del Caso Clínico - EGEL Enfermería</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#6b7280;
+  --primary:#1f4f8a; --primary2:#2f72ba; --ok:#178a4b; --bad:#b42318;
+  --line:#dfe6ee; --soft:#eef4fb; --shadow:0 18px 45px rgba(31,79,138,.12);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--text); background:
+  radial-gradient(circle at 10% 5%, rgba(47,114,186,.13), transparent 25%),
+  radial-gradient(circle at 90% 10%, rgba(31,79,138,.10), transparent 26%), var(--bg);
+}
+.wrap{max-width:1080px;margin:auto;padding:26px 16px 60px}
+.hero{
+  background:linear-gradient(135deg,#173d6f,#2d69aa); color:white; border-radius:26px;
+  padding:28px; box-shadow:var(--shadow); position:relative; overflow:hidden
+}
+.hero:after{content:"🧩";position:absolute;right:28px;top:18px;font-size:82px;opacity:.12}
+.hero h1{margin:0 0 6px;font-size:clamp(28px,5vw,44px)}
+.hero p{margin:5px 0;color:#e9f1fb}
+.hero .author{font-weight:800;margin-top:12px}
+.card{
+  background:var(--card); border:1px solid #edf1f6; box-shadow:var(--shadow);
+  border-radius:22px; padding:22px; margin-top:22px
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:800;font-size:14px;margin-bottom:7px}
+input{
+  width:100%;padding:14px;border:1px solid var(--line);border-radius:14px;font-size:16px;outline:none
+}
+input:focus{border-color:var(--primary2);box-shadow:0 0 0 4px rgba(47,114,186,.12)}
+.btn{
+  border:0;border-radius:14px;padding:12px 17px;font-weight:900;font-size:15px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;justify-content:center
+}
+.btn-primary{background:var(--primary);color:white}
+.btn-soft{background:var(--soft);color:var(--primary)}
+.btn-ghost{background:white;color:var(--text);border:1px solid var(--line)}
+.actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px}
+.hidden{display:none!important}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.badge{padding:8px 12px;background:var(--soft);color:var(--primary);font-weight:900;border-radius:999px;font-size:13px}
+.progress{height:11px;background:#e8edf3;border-radius:999px;overflow:hidden;margin-bottom:18px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,#2a64a5,#4f8fcf);transition:.25s}
+.case{
+  background:#f9fbfd;border:1px solid #e4ebf2;border-radius:18px;padding:18px;margin-bottom:18px
+}
+.case strong{color:var(--primary);display:block;margin-bottom:7px}
+.instructions{color:var(--muted);line-height:1.5}
+.board{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.pool,.zones{display:grid;gap:12px}
+.section-title{font-weight:900;margin-bottom:2px}
+.tile{
+  background:white;border:2px solid #dbe4ed;border-radius:15px;padding:13px 14px;
+  cursor:grab;font-weight:700;line-height:1.35;box-shadow:0 4px 12px rgba(31,79,138,.06)
+}
+.tile.dragging{opacity:.5}
+.tile.used{opacity:.45;cursor:default}
+.zone{
+  min-height:106px;border:2px dashed #b9c9da;border-radius:16px;padding:12px;background:#fbfdff;
+  transition:.15s
+}
+.zone.over{border-color:var(--primary2);background:#f0f6fd}
+.zone-title{font-weight:900;color:var(--primary);margin-bottom:8px}
+.zone-items{display:grid;gap:8px}
+.placed{
+  background:#fff;border:1px solid #dfe7ef;border-radius:12px;padding:10px 12px;font-weight:700;
+  display:flex;justify-content:space-between;gap:10px;align-items:center
+}
+.remove{border:0;background:#f2f4f7;border-radius:9px;cursor:pointer;padding:5px 8px}
+.feedback{display:none;margin-top:18px;padding:16px;border-radius:16px;line-height:1.5}
+.feedback.show{display:block}
+.feedback.ok{background:#eefaf3;border:1px solid #bce7cc;color:#16613a}
+.feedback.bad{background:#fff4f2;border:1px solid #f0bbb6;color:#8b261f}
+.summary{text-align:center}
+.score{
+  width:150px;height:150px;border-radius:50%;margin:12px auto 18px;display:grid;place-items:center;
+  background:conic-gradient(var(--primary) 0deg,#e9eef4 0deg);position:relative
+}
+.score:after{content:"";position:absolute;inset:13px;background:white;border-radius:50%}
+.score span{z-index:1;font-size:30px;font-weight:900}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.stat{padding:14px;border:1px solid var(--line);border-radius:15px;background:#fbfcfe}
+.stat b{display:block;font-size:22px;color:var(--primary)}
+.review{text-align:left;margin-top:20px}
+.review-item{border-top:1px solid var(--line);padding:13px 0}
+.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:760px){
+  .grid2,.board,.stats{grid-template-columns:1fr}
+  .hero,.card{padding:18px}
+}
+@media print{
+  body{background:white}
+  .hero,.card{box-shadow:none}
+  #startScreen,#gameScreen,.no-print{display:none!important}
+  #resultScreen{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>🧩 Rompecabezas del caso clínico</h1>
+    <p><b>Actividad 2 · EGEL-Enfermería</b></p>
+    <p>Clasifica la información clínica y comunitaria para resolver cada caso.</p>
+    <p class="author">Elaboró: Alejandro Torres Reyes</p>
+  </section>
+
+  <section id="startScreen" class="card">
+    <h2 style="margin-top:0">Registro del estudiante</h2>
+    <p class="instructions">
+      En cada caso encontrarás cuatro piezas. Arrástralas a la categoría correcta:
+      <b>dato relevante</b>, <b>distractor</b>, <b>factor de riesgo</b> o <b>intervención/decisión</b>.
+      Al terminar cada caso recibirás retroalimentación automática.
+    </p>
+    <div class="grid2">
+      <div>
+        <label>Nombre del estudiante</label>
+        <input id="studentName" placeholder="Nombre completo">
+      </div>
+      <div>
+        <label>Grupo / Sección</label>
+        <input id="group" placeholder="Ej. 8° A">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="startBtn">Comenzar actividad →</button>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="card hidden">
+    <div class="topbar">
+      <div class="badge" id="studentBadge"></div>
+      <div class="badge" id="caseCounter"></div>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+
+    <div class="case">
+      <strong id="caseTitle"></strong>
+      <div id="caseText"></div>
+    </div>
+
+    <p class="instructions">Arrastra cada pieza a la categoría que corresponda.</p>
+
+    <div class="board">
+      <div>
+        <div class="section-title">Piezas del caso</div>
+        <div class="pool" id="pool"></div>
+      </div>
+      <div>
+        <div class="section-title">Clasificación</div>
+        <div class="zones" id="zones"></div>
+      </div>
+    </div>
+
+    <div id="feedback" class="feedback"></div>
+
+    <div class="actions">
+      <button class="btn btn-soft" id="checkBtn">✅ Evaluar caso</button>
+      <button class="btn btn-primary hidden" id="nextBtn">Siguiente caso →</button>
+    </div>
+  </section>
+
+  <section id="resultScreen" class="card summary hidden">
+    <div class="badge">Autoevaluación final</div>
+    <h2>Resultado del rompecabezas</h2>
+    <p id="resultName"></p>
+
+    <div class="score" id="scoreRing"><span id="scorePct">0%</span></div>
+
+    <div class="stats">
+      <div class="stat"><b id="points">0</b><span>Puntos</span></div>
+      <div class="stat"><b id="maxPoints">0</b><span>Máximo</span></div>
+      <div class="stat"><b id="grade">0</b><span>Calificación /100</span></div>
+      <div class="stat"><b id="level">—</b><span>Nivel</span></div>
+    </div>
+
+    <div class="review" id="review"></div>
+
+    <div class="actions no-print">
+      <button class="btn btn-soft" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <button class="btn btn-primary" id="restartBtn">↻ Intentar nuevamente</button>
+    </div>
+  </section>
+
+  <div class="footer">EGEL-Enfermería · Actividad académica interactiva · Elaboró: Alejandro Torres Reyes</div>
+</div>
+
+<script>
+const categories = [
+  {id:"relevante", label:"Dato relevante"},
+  {id:"distractor", label:"Distractor"},
+  {id:"riesgo", label:"Factor de riesgo"},
+  {id:"decision", label:"Intervención / decisión"}
+];
+
+const cases = [
+  {
+    title:"Caso 1 · Salud comunitaria",
+    text:"En una comunidad de 11 000 habitantes, solo 30% de las aguas residuales recibe tratamiento adecuado; la contaminación atmosférica es de 10 µg/m³ y existe una cancha de basquetbol.",
+    pieces:[
+      {text:"Contaminación atmosférica de 10 µg/m³", cat:"relevante"},
+      {text:"Existe una cancha de basquetbol", cat:"distractor"},
+      {text:"70% del agua no es tratada adecuadamente", cat:"riesgo"},
+      {text:"Reconocer la condición atmosférica como el indicador saludable del caso", cat:"decision"}
+    ],
+    explanation:"En el material, la condición atmosférica es el aspecto que refleja un entorno saludable; el tratamiento insuficiente del agua representa una condición de riesgo y la cancha no define por sí sola el indicador solicitado."
+  },
+  {
+    title:"Caso 2 · Mujer de 20 a 59 años",
+    text:"Se identifican embarazadas mayores de 35 años, algunas sin control prenatal, además de consumo de alcohol y tabaco.",
+    pieces:[
+      {text:"Embarazo en mujer mayor de 35 años", cat:"relevante"},
+      {text:"Higiene bucal", cat:"distractor"},
+      {text:"Ausencia de control prenatal", cat:"riesgo"},
+      {text:"Reforzar salud sexual y reproductiva y métodos anticonceptivos", cat:"decision"}
+    ],
+    explanation:"El material enfatiza el riesgo reproductivo en edades mayores de 35 años, la necesidad de vigilancia prenatal y la utilidad de los métodos anticonceptivos para espaciar embarazos."
+  },
+  {
+    title:"Caso 3 · Adulto mayor",
+    text:"En una comunidad rural, 40% de los adultos mayores presenta fracturas de cadera; también existe anemia y antecedentes de cáncer cervicouterino en parte de la población.",
+    pieces:[
+      {text:"Alta frecuencia de fracturas de cadera", cat:"relevante"},
+      {text:"Cáncer cervicouterino", cat:"distractor"},
+      {text:"Edad avanzada y fragilidad ósea", cat:"riesgo"},
+      {text:"Implementar detección y tratamiento de osteoporosis", cat:"decision"}
+    ],
+    explanation:"La alta frecuencia de fracturas de cadera orienta a priorizar la detección y tratamiento de osteoporosis en el adulto mayor."
+  },
+  {
+    title:"Caso 4 · Diabetes mellitus",
+    text:"Un paciente presenta polidipsia, poliuria y polifagia. Tiene HbA1c de 7%, glucosa en ayuno menor de 100 mg/dL y LDL de 80 mg/dL.",
+    pieces:[
+      {text:"HbA1c de 7%", cat:"relevante"},
+      {text:"LDL de 80 mg/dL", cat:"distractor"},
+      {text:"Polidipsia, poliuria y polifagia", cat:"riesgo"},
+      {text:"Considerar la HbA1c como el dato diagnóstico del caso", cat:"decision"}
+    ],
+    explanation:"Según el material, una HbA1c de 6.5% o mayor señala diabetes; por ello, 7% es el dato determinante entre las opciones."
+  },
+  {
+    title:"Caso 5 · Visita domiciliaria",
+    text:"Una mujer de 63 años egresa después de una hospitalización por diabetes mellitus tipo 2 descontrolada. Enfermería programa visitas para verificar el cumplimiento del plan de cuidados.",
+    pieces:[
+      {text:"Verificar cumplimiento de acciones y objetivos", cat:"relevante"},
+      {text:"Edad de 63 años", cat:"distractor"},
+      {text:"Diabetes mellitus tipo 2 descontrolada", cat:"riesgo"},
+      {text:"Realizar evaluación durante el seguimiento domiciliario", cat:"decision"}
+    ],
+    explanation:"El material identifica la evaluación como la etapa orientada a verificar el cumplimiento de las acciones y los objetivos propuestos."
+  },
+  {
+    title:"Caso 6 · Proceso de enfermería",
+    text:"Un paciente con gastritis recibe tratamiento dietético y farmacológico, es dado de alta y debe continuar el tratamiento en casa.",
+    pieces:[
+      {text:"Continuación del tratamiento prescrito", cat:"relevante"},
+      {text:"Edad de 48 años", cat:"distractor"},
+      {text:"Dolor epigástrico y vómito", cat:"riesgo"},
+      {text:"Identificar la ejecución como elemento presente del plan de cuidados", cat:"decision"}
+    ],
+    explanation:"En el material, la ejecución se define como la puesta en práctica de los cuidados planificados y el suministro de las intervenciones."
+  }
+];
+
+let current=0, totalPoints=0, caseScores=[], placements={};
+let student="", group="";
+
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const resultScreen=document.getElementById("resultScreen");
+
+document.getElementById("startBtn").onclick=()=>{
+  student=document.getElementById("studentName").value.trim();
+  group=document.getElementById("group").value.trim();
+  if(!student){alert("Escribe el nombre del estudiante.");return;}
+  localStorage.setItem("rompe_student",student);
+  localStorage.setItem("rompe_group",group);
+  startScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+  renderCase();
+};
+
+function renderCase(){
+  placements={};
+  const c=cases[current];
+  document.getElementById("studentBadge").textContent=group?`${student} · ${group}`:student;
+  document.getElementById("caseCounter").textContent=`Caso ${current+1} de ${cases.length}`;
+  document.getElementById("progressBar").style.width=`${(current/cases.length)*100}%`;
+  document.getElementById("caseTitle").textContent=c.title;
+  document.getElementById("caseText").textContent=c.text;
+  document.getElementById("feedback").className="feedback";
+  document.getElementById("feedback").innerHTML="";
+  document.getElementById("nextBtn").classList.add("hidden");
+  document.getElementById("checkBtn").disabled=false;
+
+  const pool=document.getElementById("pool");
+  pool.innerHTML="";
+  c.pieces.forEach((p,i)=>{
+    const el=document.createElement("div");
+    el.className="tile";
+    el.draggable=true;
+    el.dataset.index=i;
+    el.textContent=p.text;
+    el.addEventListener("dragstart",e=>{
+      e.dataTransfer.setData("text/plain",i);
+      el.classList.add("dragging");
+    });
+    el.addEventListener("dragend",()=>el.classList.remove("dragging"));
+    el.addEventListener("click",()=>{
+      const chosen=prompt("Escribe una categoría: relevante, distractor, riesgo o decision");
+      if(chosen && categories.some(x=>x.id===chosen.trim().toLowerCase())){
+        placePiece(i,chosen.trim().toLowerCase());
+      }
+    });
+    pool.appendChild(el);
+  });
+
+  const zones=document.getElementById("zones");
+  zones.innerHTML="";
+  categories.forEach(cat=>{
+    const z=document.createElement("div");
+    z.className="zone";
+    z.dataset.cat=cat.id;
+    z.innerHTML=`<div class="zone-title">${cat.label}</div><div class="zone-items"></div>`;
+    z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("over")});
+    z.addEventListener("dragleave",()=>z.classList.remove("over"));
+    z.addEventListener("drop",e=>{
+      e.preventDefault();z.classList.remove("over");
+      const idx=Number(e.dataTransfer.getData("text/plain"));
+      placePiece(idx,cat.id);
+    });
+    zones.appendChild(z);
+  });
+}
+
+function placePiece(index,cat){
+  placements[index]=cat;
+  refreshBoard();
+}
+
+function refreshBoard(){
+  const c=cases[current];
+  document.querySelectorAll(".tile").forEach((el,i)=>{
+    el.classList.toggle("used", placements[i]!==undefined);
+  });
+  document.querySelectorAll(".zone").forEach(z=>{
+    const box=z.querySelector(".zone-items");
+    box.innerHTML="";
+    Object.entries(placements).forEach(([idx,cat])=>{
+      if(cat===z.dataset.cat){
+        const p=document.createElement("div");
+        p.className="placed";
+        p.innerHTML=`<span>${c.pieces[idx].text}</span><button class="remove" title="Quitar">✕</button>`;
+        p.querySelector(".remove").onclick=()=>{
+          delete placements[idx];
+          refreshBoard();
+        };
+        box.appendChild(p);
+      }
+    });
+  });
+}
+
+document.getElementById("checkBtn").onclick=()=>{
+  const c=cases[current];
+  if(Object.keys(placements).length<c.pieces.length){
+    alert("Clasifica todas las piezas antes de evaluar.");
+    return;
+  }
+  let score=0;
+  c.pieces.forEach((p,i)=>{
+    if(placements[i]===p.cat) score++;
+  });
+  totalPoints+=score;
+  caseScores.push(score);
+  const fb=document.getElementById("feedback");
+  const perfect=score===c.pieces.length;
+  fb.className=`feedback show ${perfect?"ok":"bad"}`;
+  fb.innerHTML=`<strong>${perfect?"✅ Caso resuelto correctamente":"🧩 Resultado del caso: "+score+" de "+c.pieces.length+" piezas correctas"}</strong><br>${c.explanation}`;
+  document.getElementById("checkBtn").disabled=true;
+  document.getElementById("nextBtn").classList.remove("hidden");
+  document.getElementById("progressBar").style.width=`${((current+1)/cases.length)*100}%`;
+};
+
+document.getElementById("nextBtn").onclick=()=>{
+  current++;
+  if(current<cases.length){
+    renderCase();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else showResults();
+};
+
+function showResults(){
+  gameScreen.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+  const max=cases.length*4;
+  const pct=Math.round(totalPoints/max*100);
+  const level=pct>=90?"Excelente":pct>=80?"Satisfactorio":pct>=70?"En proceso":"Reforzar";
+  document.getElementById("resultName").textContent=group?`${student} · Grupo/Sección: ${group}`:student;
+  document.getElementById("points").textContent=totalPoints;
+  document.getElementById("maxPoints").textContent=max;
+  document.getElementById("grade").textContent=pct;
+  document.getElementById("level").textContent=level;
+  document.getElementById("scorePct").textContent=pct+"%";
+  document.getElementById("scoreRing").style.background=`conic-gradient(var(--primary) 0deg,var(--primary) ${pct*3.6}deg,#e9eef4 ${pct*3.6}deg)`;
+
+  const review=document.getElementById("review");
+  review.innerHTML="<h3>Desempeño por caso</h3>";
+  cases.forEach((c,i)=>{
+    const d=document.createElement("div");
+    d.className="review-item";
+    d.innerHTML=`<b>${i+1}. ${c.title}</b><br><span>${caseScores[i]} de 4 piezas correctas.</span><br><small>${c.explanation}</small>`;
+    review.appendChild(d);
+  });
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.getElementById("restartBtn").onclick=()=>{
+  current=0; totalPoints=0; caseScores=[]; placements={};
+  resultScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+  document.getElementById("studentName").value=student;
+  document.getElementById("group").value=group;
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+window.addEventListener("DOMContentLoaded",()=>{
+  const s=localStorage.getItem("rompe_student");
+  const g=localStorage.getItem("rompe_group");
+  if(s) document.getElementById("studentName").value=s;
+  if(g) document.getElementById("group").value=g;
+});
+</script>
+</body>
+</html>

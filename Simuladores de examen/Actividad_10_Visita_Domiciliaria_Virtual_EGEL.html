@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><script src="../registro-compartido.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visita Domiciliaria Virtual - EGEL Enfermería</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#fff; --text:#1f2937; --muted:#667085;
+  --primary:#1f4f8a; --primary2:#2f6fb1; --ok:#16834a; --bad:#b42318;
+  --plan:#805ad5; --eval:#d97706; --line:#dfe6ee; --soft:#eef4fb;
+  --shadow:0 18px 45px rgba(31,79,138,.12);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 8% 5%,rgba(47,111,177,.13),transparent 24%),
+    radial-gradient(circle at 92% 8%,rgba(128,90,213,.08),transparent 24%),
+    var(--bg);
+}
+.wrap{max-width:1060px;margin:auto;padding:28px 16px 60px}
+.hero{
+  background:linear-gradient(135deg,#173f73,#2f6fb1);
+  color:#fff;border-radius:28px;padding:28px;box-shadow:var(--shadow);
+  position:relative;overflow:hidden
+}
+.hero:after{content:"🏠";position:absolute;right:24px;top:8px;font-size:104px;opacity:.13}
+.hero h1{margin:0 0 7px;font-size:clamp(28px,5vw,44px)}
+.hero p{margin:5px 0;color:#e9f1fb}
+.hero .author{font-weight:900;margin-top:12px}
+.card{
+  background:var(--card);border:1px solid #edf1f6;border-radius:22px;
+  padding:23px;margin-top:22px;box-shadow:var(--shadow)
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:800;font-size:14px;margin-bottom:7px}
+input{
+  width:100%;padding:14px;border:1px solid var(--line);border-radius:14px;font-size:16px;outline:none
+}
+input:focus{border-color:var(--primary2);box-shadow:0 0 0 4px rgba(47,111,177,.12)}
+.btn{
+  border:0;border-radius:14px;padding:13px 18px;font-size:15px;font-weight:900;
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-soft{background:var(--soft);color:var(--primary)}
+.actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px}
+.hidden{display:none!important}
+.badge{
+  display:inline-block;padding:8px 12px;border-radius:999px;background:var(--soft);
+  color:var(--primary);font-size:13px;font-weight:900
+}
+.topbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.progress{height:11px;background:#e9eef4;border-radius:999px;overflow:hidden;margin:14px 0 20px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,#2f6fb1,#7b61c9);transition:.25s}
+
+.house{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#d9e7f5;
+  border:4px solid #aac3dc;border-radius:24px;padding:12px;position:relative;
+  box-shadow:inset 0 0 0 6px rgba(255,255,255,.5)
+}
+.room{
+  min-height:170px;background:#fff;border:2px solid #cddbe8;border-radius:16px;
+  padding:14px;position:relative;overflow:hidden
+}
+.room h3{margin:0 0 8px;color:var(--primary)}
+.room p{font-size:13px;color:var(--muted);margin:0}
+.hotspot{
+  position:absolute;width:54px;height:54px;border-radius:50%;
+  border:0;background:var(--primary);color:#fff;font-size:25px;cursor:pointer;
+  display:grid;place-items:center;box-shadow:0 7px 16px rgba(31,79,138,.25);
+  animation:pulse 1.7s infinite
+}
+.hotspot:hover{transform:scale(1.07)}
+@keyframes pulse{50%{box-shadow:0 0 0 9px rgba(47,111,177,.12),0 7px 16px rgba(31,79,138,.25)}}
+.hs1{right:18px;bottom:20px}.hs2{left:18px;bottom:18px}.hs3{right:24px;top:55px}.hs4{left:25px;top:60px}
+.casepanel{
+  margin-top:18px;background:#f9fbfd;border:1px solid #e4ebf2;border-radius:18px;padding:18px
+}
+.casepanel h2{margin:0 0 8px;font-size:21px}
+.casepanel p{line-height:1.55;margin:0}
+.question{font-size:19px;font-weight:900;margin:18px 0 12px}
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.option{
+  border:2px solid #e2e8f0;background:#fff;border-radius:16px;padding:15px;
+  cursor:pointer;font-weight:900;text-align:center
+}
+.option:hover{border-color:#aac4df;background:#f8fbff}
+.option.correct{border-color:#65c88f;background:#effaf3;color:#145f38}
+.option.wrong{border-color:#ea9a94;background:#fff3f2;color:#8b211b}
+.option:disabled{cursor:default}
+.feedback{display:none;margin-top:16px;padding:15px;border-radius:16px;line-height:1.55}
+.feedback.show{display:block}
+.feedback.ok{background:#eefaf3;border:1px solid #bce7cc;color:#16613a}
+.feedback.bad{background:#fff4f2;border:1px solid #efbbb6;color:#8a251f}
+.help{
+  margin-top:10px;border-left:5px solid var(--primary2);background:#f7fbff;padding:10px 12px;border-radius:10px
+}
+.note{color:var(--muted);line-height:1.55}
+.result{text-align:center}
+.score{
+  width:150px;height:150px;border-radius:50%;display:grid;place-items:center;margin:12px auto 18px;
+  position:relative;background:conic-gradient(var(--primary) 0deg,#e9eef4 0deg)
+}
+.score:after{content:"";position:absolute;inset:13px;background:#fff;border-radius:50%}
+.score span{position:relative;z-index:2;font-size:30px;font-weight:900}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.stat{border:1px solid var(--line);border-radius:15px;padding:14px;background:#fbfcfe}
+.stat b{display:block;font-size:22px;color:var(--primary)}
+.review{text-align:left;margin-top:20px}
+.review-item{padding:13px 0;border-top:1px solid var(--line)}
+.review-item:first-child{border-top:0}
+.review-item small{color:var(--muted)}
+.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:24px}
+@media(max-width:760px){
+  .grid2,.options,.stats,.house{grid-template-columns:1fr}
+  .hero,.card{padding:18px}
+  .room{min-height:145px}
+}
+@media print{
+  body{background:#fff}
+  .hero,.card{box-shadow:none}
+  #startScreen,#gameScreen,.no-print{display:none!important}
+  #resultScreen{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>🏠 Visita domiciliaria virtual</h1>
+    <p><b>Actividad 10 · EGEL-Enfermería</b></p>
+    <p>Explora la vivienda, identifica hallazgos y reconoce la fase de la visita domiciliaria.</p>
+    <p class="author">Elaboró: Alejandro Torres Reyes</p>
+  </section>
+
+  <section id="startScreen" class="card">
+    <h2 style="margin-top:0">Registro del estudiante</h2>
+    <p class="note">
+      Explora cada vivienda haciendo clic en el punto activo. Lee la situación y decide si corresponde a
+      <b>valoración</b>, <b>planificación</b> o <b>evaluación</b>. La actividad se autoevalúa al finalizar.
+    </p>
+    <div class="grid2">
+      <div>
+        <label>Nombre del estudiante</label>
+        <input id="studentName" placeholder="Nombre completo">
+      </div>
+      <div>
+        <label>Grupo / Sección</label>
+        <input id="group" placeholder="Ej. 8° A">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="startBtn">Iniciar visita →</button>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="card hidden">
+    <div class="topbar">
+      <div class="badge" id="studentBadge"></div>
+      <div class="badge" id="counter"></div>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+
+    <div class="house">
+      <div class="room">
+        <h3>🛋️ Sala</h3>
+        <p>Observa el entorno familiar y las condiciones de la vivienda.</p>
+        <button class="hotspot hs1" id="hot1">🔎</button>
+      </div>
+      <div class="room">
+        <h3>🍽️ Cocina</h3>
+        <p>Revisa hábitos, alimentación y recursos disponibles.</p>
+        <button class="hotspot hs2" id="hot2">🔎</button>
+      </div>
+      <div class="room">
+        <h3>🛏️ Recámara</h3>
+        <p>Explora seguimiento, descanso, tratamiento y autocuidado.</p>
+        <button class="hotspot hs3" id="hot3">🔎</button>
+      </div>
+      <div class="room">
+        <h3>💊 Área de medicamentos</h3>
+        <p>Identifica adherencia terapéutica y necesidades educativas.</p>
+        <button class="hotspot hs4" id="hot4">🔎</button>
+      </div>
+    </div>
+
+    <div id="casePanel" class="casepanel hidden">
+      <h2 id="caseTitle"></h2>
+      <p id="caseText"></p>
+      <div class="question">¿Qué fase de la visita domiciliaria representa principalmente esta situación?</div>
+
+      <div class="options">
+        <button class="option" data-value="valoracion">🔎 Valoración</button>
+        <button class="option" data-value="planificacion">📝 Planificación</button>
+        <button class="option" data-value="evaluacion">✅ Evaluación</button>
+      </div>
+
+      <div id="feedback" class="feedback"></div>
+
+      <div class="actions">
+        <button class="btn btn-primary hidden" id="nextBtn">Siguiente visita →</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="resultScreen" class="card result hidden">
+    <div class="badge">Autoevaluación final</div>
+    <h2>Resultado de la visita domiciliaria</h2>
+    <p id="resultName"></p>
+
+    <div class="score" id="scoreRing"><span id="scorePct">0%</span></div>
+
+    <div class="stats">
+      <div class="stat"><b id="correctCount">0</b><span>Aciertos</span></div>
+      <div class="stat"><b id="wrongCount">0</b><span>Errores</span></div>
+      <div class="stat"><b id="grade">0</b><span>Calificación /100</span></div>
+      <div class="stat"><b id="level">—</b><span>Nivel</span></div>
+    </div>
+
+    <div class="review" id="review"></div>
+
+    <div class="actions no-print">
+      <button class="btn btn-soft" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <button class="btn btn-primary" id="restartBtn">↻ Realizar otra vez</button>
+    </div>
+  </section>
+
+  <div class="footer">EGEL-Enfermería · Actividad interactiva · Elaboró: Alejandro Torres Reyes</div>
+</div>
+
+<script>
+const visits = [
+  {
+    room:0,
+    title:"Visita 1 · Seguimiento de diabetes",
+    text:"Una mujer de 63 años egresó del hospital por diabetes mellitus tipo 2 descontrolada. El profesional de enfermería acude al domicilio para verificar si se cumplieron las acciones y los objetivos establecidos en el plan de cuidados.",
+    answer:"evaluacion",
+    explanation:"En el material, esta situación corresponde a evaluación, porque se verifica el cumplimiento de las acciones y de los objetivos previamente propuestos."
+  },
+  {
+    room:3,
+    title:"Visita 2 · Falta de adherencia terapéutica",
+    text:"La enfermera visita a una mujer de 61 años que dejó de acudir al control de diabetes. Durante la visita indaga los motivos de la falta de adherencia terapéutica y farmacológica. La paciente refiere que no cuenta con apoyo familiar.",
+    answer:"valoracion",
+    explanation:"El material describe la valoración como la recolección, organización e interpretación de información para detectar necesidades y problemas."
+  },
+  {
+    room:0,
+    title:"Visita 3 · Preparación previa",
+    text:"Antes de acudir al domicilio, el equipo define claramente el motivo de la visita, establece objetivos, diseña una pauta de observación, obtiene consentimiento y acuerda día, fecha y hora.",
+    answer:"planificacion",
+    explanation:"El material señala que la planificación implica definir el motivo, fijar objetivos, preparar la observación, obtener consentimiento y precisar la fecha y hora."
+  },
+  {
+    room:1,
+    title:"Visita 4 · Alimentación y entorno",
+    text:"En el domicilio, la enfermera observa los alimentos disponibles, pregunta por los hábitos de alimentación, identifica riesgos y registra la información obtenida.",
+    answer:"valoracion",
+    explanation:"Se trata de valoración porque se recopilan datos del hogar y de los hábitos de la persona para identificar necesidades de cuidado."
+  },
+  {
+    room:2,
+    title:"Visita 5 · Verificación de resultados",
+    text:"En una visita de seguimiento, la enfermera compara el estado actual de la paciente con los objetivos establecidos en la visita anterior y determina si las intervenciones lograron el resultado esperado.",
+    answer:"evaluacion",
+    explanation:"La evaluación implica contrastar la situación actual y los resultados con los objetivos previamente definidos."
+  },
+  {
+    room:3,
+    title:"Visita 6 · Diseño de intervención",
+    text:"Después de identificar problemas de adherencia, el equipo decide realizar educación sobre medicamentos, involucrar a la familia y programar una nueva visita de seguimiento.",
+    answer:"planificacion",
+    explanation:"La situación corresponde a planificación porque se establecen acciones y estrategias que se aplicarán posteriormente."
+  },
+  {
+    room:1,
+    title:"Visita 7 · Recolección de antecedentes",
+    text:"Durante la primera visita, la enfermera pregunta por horarios de comida, actividad física, consumo de medicamentos, apoyo familiar y dificultades para acudir al centro de salud.",
+    answer:"valoracion",
+    explanation:"La obtención sistemática de antecedentes y factores que afectan la salud forma parte de la valoración."
+  },
+  {
+    room:2,
+    title:"Visita 8 · Análisis posterior",
+    text:"Al retirarse del domicilio, el equipo analiza los datos obtenidos, extrae conclusiones y determina si las acciones realizadas han generado los cambios esperados.",
+    answer:"evaluacion",
+    explanation:"El material indica que la evaluación de la visita continúa después de retirarse del hogar, cuando el equipo analiza la información y extrae conclusiones."
+  }
+];
+
+let current=0, correct=0, answers=[], active=false;
+let student="", group="";
+
+const hotspots=[
+  document.getElementById("hot1"),
+  document.getElementById("hot2"),
+  document.getElementById("hot3"),
+  document.getElementById("hot4")
+];
+const startScreen=document.getElementById("startScreen");
+const gameScreen=document.getElementById("gameScreen");
+const resultScreen=document.getElementById("resultScreen");
+const casePanel=document.getElementById("casePanel");
+const optionBtns=[...document.querySelectorAll(".option")];
+
+document.getElementById("startBtn").onclick=()=>{
+  student=document.getElementById("studentName").value.trim();
+  group=document.getElementById("group").value.trim();
+  if(!student){
+    alert("Escribe el nombre del estudiante para comenzar.");
+    document.getElementById("studentName").focus();
+    return;
+  }
+  localStorage.setItem("visita_student",student);
+  localStorage.setItem("visita_group",group);
+
+  startScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
+  prepareVisit();
+};
+
+function prepareVisit(){
+  active=false;
+  const v=visits[current];
+  document.getElementById("studentBadge").textContent=group?`${student} · ${group}`:student;
+  document.getElementById("counter").textContent=`Visita ${current+1} de ${visits.length}`;
+  document.getElementById("progressBar").style.width=`${(current/visits.length)*100}%`;
+  casePanel.classList.add("hidden");
+
+  hotspots.forEach((h,i)=>{
+    h.style.display=i===v.room?"grid":"none";
+  });
+}
+
+hotspots.forEach(h=>h.onclick=()=>openCase());
+
+function openCase(){
+  if(active) return;
+  active=true;
+  const v=visits[current];
+  document.getElementById("caseTitle").textContent=v.title;
+  document.getElementById("caseText").textContent=v.text;
+
+  optionBtns.forEach(b=>{
+    b.disabled=false;
+    b.classList.remove("correct","wrong");
+  });
+
+  const fb=document.getElementById("feedback");
+  fb.className="feedback";
+  fb.innerHTML="";
+  document.getElementById("nextBtn").classList.add("hidden");
+  casePanel.classList.remove("hidden");
+  casePanel.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+optionBtns.forEach(btn=>{
+  btn.onclick=()=>{
+    const v=visits[current];
+    optionBtns.forEach(b=>b.disabled=true);
+
+    const selected=btn.dataset.value;
+    const ok=selected===v.answer;
+    if(ok) correct++;
+    answers.push({selected,correct:ok});
+
+    const correctBtn=optionBtns.find(b=>b.dataset.value===v.answer);
+    correctBtn.classList.add("correct");
+    if(!ok) btn.classList.add("wrong");
+
+    const fb=document.getElementById("feedback");
+    fb.className=`feedback show ${ok?"ok":"bad"}`;
+    fb.innerHTML=`
+      <strong>${ok?"✅ Fase correctamente identificada":"❌ Revisa la fase"}</strong>
+      <div class="help"><b>Fundamento:</b> ${v.explanation}</div>
+    `;
+
+    document.getElementById("progressBar").style.width=`${((current+1)/visits.length)*100}%`;
+    document.getElementById("nextBtn").classList.remove("hidden");
+  };
+});
+
+document.getElementById("nextBtn").onclick=()=>{
+  current++;
+  if(current<visits.length){
+    prepareVisit();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else showResults();
+};
+
+function phaseLabel(v){
+  return v==="valoracion"?"Valoración":v==="planificacion"?"Planificación":"Evaluación";
+}
+
+function showResults(){
+  gameScreen.classList.add("hidden");
+  resultScreen.classList.remove("hidden");
+
+  const pct=Math.round(correct/visits.length*100);
+  const wrong=visits.length-correct;
+  const level=pct>=90?"Excelente":pct>=80?"Satisfactorio":pct>=70?"En proceso":"Reforzar";
+
+  document.getElementById("resultName").textContent=group?`${student} · Grupo/Sección: ${group}`:student;
+  document.getElementById("correctCount").textContent=correct;
+  document.getElementById("wrongCount").textContent=wrong;
+  document.getElementById("grade").textContent=pct;
+  document.getElementById("level").textContent=level;
+  document.getElementById("scorePct").textContent=pct+"%";
+  document.getElementById("scoreRing").style.background=
+    `conic-gradient(var(--primary) 0deg,var(--primary) ${pct*3.6}deg,#e9eef4 ${pct*3.6}deg)`;
+
+  const review=document.getElementById("review");
+  review.innerHTML="<h3>Revisión de visitas</h3>";
+  visits.forEach((v,i)=>{
+    const a=answers[i];
+    const d=document.createElement("div");
+    d.className="review-item";
+    d.innerHTML=`
+      <b>${a.correct?"✅":"❌"} ${i+1}. ${v.title}</b><br>
+      <small>Tu respuesta: ${phaseLabel(a.selected)} · Correcta: ${phaseLabel(v.answer)}</small>
+      ${a.correct?"":`<div style="margin-top:6px">${v.explanation}</div>`}
+    `;
+    review.appendChild(d);
+  });
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.getElementById("restartBtn").onclick=()=>{
+  current=0;correct=0;answers=[];active=false;
+  resultScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+  document.getElementById("studentName").value=student;
+  document.getElementById("group").value=group;
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+window.addEventListener("DOMContentLoaded",()=>{
+  const s=localStorage.getItem("visita_student");
+  const g=localStorage.getItem("visita_group");
+  if(s) document.getElementById("studentName").value=s;
+  if(g) document.getElementById("group").value=g;
+});
+</script>
+</body>
+</html>
