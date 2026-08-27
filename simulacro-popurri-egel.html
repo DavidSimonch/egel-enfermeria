@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
+    <title>Popurrí EGEL | Retroalimentación inmediata</title>
+    <script src="registro-compartido.js"></script>
+    <style>
+        :root{--navy:#163b65;--blue:#0c6cb5;--teal:#087d74;--ink:#172536;--muted:#5e6d7e;--line:#dfe6ee;--soft:#eef4fb;--good:#16613a;--good-bg:#eefaf3;--bad:#8a251f;--bad-bg:#fff4f2;--warning:#8b5b1d;--warning-bg:#fff7e8}
+        *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f8fbff,#edf4f8);color:var(--ink)}
+        .wrap{max-width:980px;margin:auto;padding:24px 15px 60px}.hero{background:linear-gradient(135deg,#173f73,var(--navy));color:#fff;border-radius:26px;padding:26px;box-shadow:0 16px 38px #173f7320}
+        .hero h1{margin:0 0 7px;font-size:clamp(27px,5vw,42px)}.hero p{margin:5px 0;color:#edf4fb}.author{font-weight:900!important}
+        .card{background:#fff;border:1px solid #edf1f6;border-radius:22px;padding:22px;margin-top:20px;box-shadow:0 14px 34px #173f7314}
+        .grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}.top{display:flex;justify-content:space-between;gap:9px;flex-wrap:wrap}
+        .badge{display:inline-block;padding:7px 11px;border-radius:999px;background:var(--soft);color:var(--navy);font-size:13px;font-weight:900}.label{display:block;font-weight:800;font-size:14px;margin-bottom:6px}input{width:100%;padding:13px;border:1px solid var(--line);border-radius:13px;font-size:16px}label{display:block;font-weight:800;font-size:14px;margin-bottom:6px}
+        .btn{border:0;border-radius:13px;padding:12px 17px;font-weight:900;font-size:15px;cursor:pointer}.primary{background:var(--navy);color:#fff}.soft{background:var(--soft);color:var(--navy)}.secondary{background:#f2f6fb;color:var(--navy);border:1px solid var(--line)}
+        .actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin-top:17px}.hidden{display:none!important}.note{color:var(--muted);line-height:1.55}
+        .progress{height:10px;background:#e9eef4;border-radius:999px;overflow:hidden;margin:13px 0 19px}.progress>div{height:100%;background:linear-gradient(90deg,#0c6cb5,var(--teal));transition:.2s}
+        .case{background:#f9fbfd;border:1px solid #e3eaf2;border-radius:17px;padding:17px;line-height:1.55}.case h2{margin:0 0 7px}.options{display:grid;gap:10px;margin-top:14px}.opt{border:2px solid #e2e8f0;background:#fff;border-radius:14px;padding:13px 14px;text-align:left;font-weight:800;cursor:pointer;font-size:15px;transition:.15s ease}.opt:hover{border-color:#9bb7d9}.opt.good{border-color:#65c88f;background:#effaf3;color:#145f38}.opt.bad{border-color:#e99b94;background:#fff3f2;color:#8b211b}.opt:disabled{cursor:default}
+        .feedback{display:none;margin-top:15px;padding:15px;border-radius:14px;line-height:1.55}.feedback.show{display:block}.feedback.good{background:var(--good-bg);border:1px solid #bce7cc;color:var(--good)}.feedback.bad{background:var(--bad-bg);border:1px solid #efbbb6;color:var(--bad)}
+        .result{text-align:center}.score{font-size:42px;font-weight:950;color:var(--navy)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:17px 0}.stat{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fbfcfe}.stat b{display:block;font-size:21px;color:var(--navy)}
+        .review{text-align:left;margin-top:18px}.review>div{border-top:1px solid var(--line);padding:11px 0}.review strong{display:block;margin-bottom:4px}.review small{color:var(--muted);display:block;margin-top:4px}.footer-note{text-align:center;color:var(--muted);font-size:12px;margin-top:22px}
+        @media(max-width:720px){.grid2,.stats{grid-template-columns:1fr}.hero,.card{padding:17px}} 
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <section class="hero">
+            <h1>🎯 Popurrí EGEL</h1>
+            <p><b>Simulacro mixto · sin límite de tiempo</b></p>
+            <p>Ejercicios combinados de enfermería con retroalimentación inmediata tras cada respuesta.</p>
+            <p class="author">Elaboró: Alejandro Torres Reyes</p>
+        </section>
+
+        <section id="start" class="card">
+            <h2>Registro del estudiante</h2>
+            <p class="note">Completa tus datos. El simulacro no tiene cronómetro y te mostrará si la respuesta fue correcta al instante.</p>
+            <div class="grid2">
+                <div>
+                    <label for="student">Nombre del estudiante</label>
+                    <input id="student" placeholder="Nombre completo">
+                </div>
+                <div>
+                    <label for="group">Grupo / Sección</label>
+                    <input id="group" placeholder="Ej. 8° A">
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn primary" id="startBtn" type="button">Comenzar →</button>
+            </div>
+        </section>
+
+        <section id="game" class="card hidden">
+            <div class="top">
+                <span class="badge" id="who"></span>
+                <span class="badge" id="count"></span>
+            </div>
+            <div class="progress"><div id="bar"></div></div>
+            <div class="case">
+                <h2 id="qtitle"></h2>
+                <div id="scenario"></div>
+            </div>
+            <h3 id="prompt"></h3>
+            <div class="options" id="opts"></div>
+            <div id="fb" class="feedback"></div>
+            <div class="actions">
+                <button class="btn secondary hidden" id="prev" type="button">← Anterior</button>
+                <button class="btn primary hidden" id="next" type="button">Siguiente →</button>
+            </div>
+        </section>
+
+        <section id="result" class="card result hidden">
+            <span class="badge">Autoevaluación final</span>
+            <h2>Resultado</h2>
+            <p id="rname"></p>
+            <div class="score" id="pct"></div>
+            <div class="stats">
+                <div class="stat"><b id="ok"></b>Aciertos</div>
+                <div class="stat"><b id="err"></b>Errores</div>
+                <div class="stat"><b id="grade"></b>Calificación / 100</div>
+                <div class="stat"><b id="level"></b>Nivel</div>
+            </div>
+            <div class="review" id="review"></div>
+            <div class="actions">
+                <button class="btn soft" type="button" onclick="window.print()">🖨️ Imprimir / PDF</button>
+                <button class="btn primary" id="again" type="button">↻ Repetir</button>
+            </div>
+        </section>
+
+        <p class="footer-note">EGEL-Enfermería · Popurrí de ejercicios · Retroalimentación inmediata</p>
+    </div>
+
+    <script>
+        const DATA = [
+            {
+                title: 'Prevención en comunidad',
+                scenario: 'Una comunidad presenta alta frecuencia de diarrea infantil por falta de higiene y agua segura.',
+                prompt: '¿Qué estrategia es la más adecuada para abordar el problema?',
+                options: ['Promoción de higiene de manos y manejo adecuado del agua', 'Solo reforzar la atención médica en urgencias', 'Evitar la educación porque es un problema sanitario'],
+                answer: 0,
+                feedback: '✅ Correcto: la promoción de higiene de manos y el manejo adecuado del agua son estrategias clave para prevenir la diarrea y mejorar la salud comunitaria.'
+            },
+            {
+                title: 'Diagnóstico de enfermería',
+                scenario: 'Paciente con ansiedad, fiebre, dolor abdominal y dificultad para dormir después de una experiencia traumática.',
+                prompt: '¿Qué tipo de diagnóstico corresponde?',
+                options: ['Diagnóstico de riesgo', 'Diagnóstico de promoción de la salud', 'Diagnóstico de salud problemático'],
+                answer: 2,
+                feedback: '✅ Correcto: cuando ya existe un problema de salud con evidencia clara, se prioriza un diagnóstico de salud problemático o diagnóstico real.'
+            },
+            {
+                title: 'Lactancia materna',
+                scenario: 'Se desea fortalecer la lactancia exclusiva durante los primeros seis meses.',
+                prompt: '¿Qué acción resulta más efectiva?',
+                options: ['Reforzar la educación y apoyo a la madre', 'Evitar la supervisión del recién nacido', 'Restringir la alimentación a horarios fijos', 'No hacer seguimiento'],
+                answer: 0,
+                feedback: '✅ Correcto: la educación y el apoyo a la madre favorecen la lactancia exclusiva y el éxito del proceso.'
+            },
+            {
+                title: 'Violencia de género',
+                scenario: 'Una adolescente refiere que su pareja la obliga a tener relaciones sexuales sin su consentimiento.',
+                prompt: '¿Qué tipo de violencia se identifica?',
+                options: ['Violencia psicológica', 'Violencia sexual', 'Violencia económica'],
+                answer: 1,
+                feedback: '✅ Correcto: la coerción para mantener relaciones sexuales sin consentimiento corresponde a violencia sexual.'
+            },
+            {
+                title: 'Intervenciones educativas',
+                scenario: 'Se requiere informar a jóvenes sobre uso de preservativos y prevención de ITS.',
+                prompt: '¿Qué estrategia educativa es la más apropiada?',
+                options: ['Charla educativa con participación activa', 'Solo entrega de folletos sin explicación', 'Ignorar la necesidad por falta de tiempo'],
+                answer: 0,
+                feedback: '✅ Correcto: la charla educativa con participación activa favorece el aprendizaje, la reflexión y la toma de decisiones en salud.'
+            },
+            {
+                title: 'Riesgo cardiovascular',
+                scenario: 'Paciente con hipertensión, sobrepeso y consumo elevado de sal.',
+                prompt: '¿Cuál es la intervención prioritaria?',
+                options: ['Educación sobre alimentación saludable y control de la presión', 'Solo administrar analgésicos', 'Desestimar la dieta por el sobrepeso'],
+                answer: 0,
+                feedback: '✅ Correcto: la educación sobre alimentación saludable y control de la presión es prioritaria para reducir el riesgo cardiovascular.'
+            },
+            {
+                title: 'Cuidado del recién nacido',
+                scenario: 'Se observa que el niño presenta fiebre y llanto persistente.',
+                prompt: '¿Qué acción es prioritaria?',
+                options: ['Valorar signos de alarma y activar atención médica', 'Esperar a que pase solo', 'Dar solo agua'],
+                answer: 0,
+                feedback: '✅ Correcto: ante signos de alarma en un recién nacido, la prioridad es la valoración clínica y la atención inmediata.'
+            },
+            {
+                title: 'NOC / indicadores',
+                scenario: 'Se quiere evaluar la eficacia de un plan de cuidado para el control del dolor.',
+                prompt: '¿Qué opción representa mejor un indicador de resultado?',
+                options: ['Dolor reportado por el paciente', 'Intervención del personal', 'Cuaderno de enfermería sin análisis'],
+                answer: 0,
+                feedback: '✅ Correcto: un indicador de resultado debe reflejar la respuesta del paciente, por ejemplo, el nivel de dolor reportado.'
+            },
+            {
+                title: 'Promoción de la salud',
+                scenario: 'Un grupo de adolescentes presenta hábitos sedentarios y consumo de alcohol.',
+                prompt: '¿Cuál es un objetivo apropiado de promoción?',
+                options: ['Incrementar la actividad física y reducir el consumo de alcohol', 'Eliminar a los adolescentes del programa', 'Solo dar información sin seguimiento'],
+                answer: 0,
+                feedback: '✅ Correcto: el objetivo de promoción debe enfocar cambios positivos en hábitos y estilo de vida.'
+            },
+            {
+                title: 'Cuidado materno',
+                scenario: 'Durante la consulta prenatal, la embarazada presenta ansiedad y dudas sobre la atención de su embarazo.',
+                prompt: '¿Qué respuesta de enfermería es más adecuada?',
+                options: ['Escuchar, aclarar dudas y orientar sobre su embarazo', 'Decirle que todo estará bien sin explicar', 'Cambiar de tema para evitar la ansiedad'],
+                answer: 0,
+                feedback: '✅ Correcto: escuchar, aclarar dudas y orientar con información clara favorece la seguridad y la adherencia al cuidado prenatal.'
+            },
+            {
+                title: 'Riesgo de caídas',
+                scenario: 'Paciente adulto mayor con debilidad, mareos y medicamentos que afectan el equilibrio.',
+                prompt: '¿Qué acción preventiva es prioritaria?',
+                options: ['Evaluar riesgo de caídas y orientar medidas de seguridad', 'Permitir que camine sin apoyo', 'Aumentar medicamentos sin revisión'],
+                answer: 0,
+                feedback: '✅ Correcto: la evaluación del riesgo de caídas y la implementación de medidas de seguridad son esenciales en adultos mayores.'
+            },
+            {
+                title: 'Prevención de adicciones',
+                scenario: 'Se observa en jóvenes consumo frecuente de tabaco y alcohol durante reuniones sociales.',
+                prompt: '¿Qué estrategia de educación en salud es la más efectiva?',
+                options: ['Educación grupal con información y práctica de habilidades', 'Solo advertir sin explicación', 'Excluir a los jóvenes de la intervención'],
+                answer: 0,
+                feedback: '✅ Correcto: la educación grupal con información clara y práctica de habilidades favorece la prevención de adicciones.'
+            }
+        ];
+
+        const student = sessionStorage.getItem('egel_student_name');
+        const group = sessionStorage.getItem('egel_student_group') || '';
+        let current = 0;
+        let good = 0;
+        let answers = [];
+
+        const $ = (id) => document.getElementById(id);
+
+        function startGame() {
+            const name = $('student').value.trim();
+            const section = $('group').value.trim();
+            if (!name) {
+                alert('Escribe el nombre del estudiante para continuar.');
+                return;
+            }
+            sessionStorage.setItem('egel_student_name', name);
+            sessionStorage.setItem('egel_student_group', section);
+            $('start').classList.add('hidden');
+            $('game').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = DATA[current];
+            $('who').textContent = group || $('student').value.trim() || 'Estudiante';
+            $('count').textContent = `${current + 1} de ${DATA.length}`;
+            $('bar').style.width = `${((current + 1) / DATA.length) * 100}%`;
+            $('qtitle').textContent = q.title;
+            $('scenario').textContent = q.scenario;
+            $('prompt').textContent = q.prompt;
+            const opts = $('opts');
+            opts.innerHTML = '';
+
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'opt';
+                btn.textContent = `${String.fromCharCode(65 + index)}. ${option}`;
+                btn.disabled = answers[current] !== undefined;
+                btn.addEventListener('click', () => chooseAnswer(index));
+                opts.appendChild(btn);
+            });
+
+            if (answers[current] !== undefined) {
+                const selectedIndex = answers[current].selected;
+                const selectedBtn = opts.querySelectorAll('.opt')[selectedIndex];
+                if (selectedBtn) {
+                    selectedBtn.classList.add(answers[current].correct ? 'good' : 'bad');
+                }
+                const correctIndex = q.answer;
+                const correctBtn = opts.querySelectorAll('.opt')[correctIndex];
+                if (correctBtn) correctBtn.classList.add('good');
+                $('fb').className = 'feedback show ' + (answers[current].correct ? 'good' : 'bad');
+                $('fb').innerHTML = `<b>${answers[current].correct ? '✅ Correcto' : '❌ Revisa tu respuesta'}</b><br>${q.feedback}`;
+                $('next').classList.remove('hidden');
+                $('prev').classList.toggle('hidden', current === 0);
+            } else {
+                $('fb').className = 'feedback';
+                $('fb').innerHTML = '';
+                $('next').classList.add('hidden');
+                $('prev').classList.toggle('hidden', current === 0);
+            }
+        }
+
+        function chooseAnswer(index) {
+            const q = DATA[current];
+            const correct = index === q.answer;
+            if (correct) good += 1;
+            answers[current] = { selected: index, correct };
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (current < DATA.length - 1) {
+                current += 1;
+                renderQuestion();
+            } else {
+                finish();
+            }
+        }
+
+        function finish() {
+            $('game').classList.add('hidden');
+            $('result').classList.remove('hidden');
+            const total = DATA.length;
+            const percent = Math.round((good / total) * 100);
+            const level = percent >= 90 ? 'Excelente' : percent >= 80 ? 'Satisfactorio' : percent >= 70 ? 'En proceso' : 'Reforzar';
+            $('rname').textContent = $('group').value.trim() ? `${$('student').value.trim()} · Grupo/Sección: ${$('group').value.trim()}` : $('student').value.trim();
+            $('ok').textContent = good;
+            $('err').textContent = total - good;
+            $('grade').textContent = percent;
+            $('level').textContent = level;
+            $('pct').textContent = `${percent}%`;
+
+            const review = $('review');
+            review.innerHTML = '<h3>Revisión</h3>';
+            DATA.forEach((q, index) => {
+                const selected = answers[index];
+                const item = document.createElement('div');
+                item.innerHTML = `
+                    <strong>${index + 1}. ${q.title}</strong>
+                    <div><b>${selected && selected.correct ? '✅ Correcto' : '❌ Incorrecto'}</b></div>
+                    <small>Tu respuesta: ${selected ? q.options[selected.selected] : 'Sin respuesta'}</small>
+                    <small>Respuesta correcta: ${q.options[q.answer]}</small>
+                    <div>${q.feedback}</div>
+                `;
+                review.appendChild(item);
+            });
+        }
+
+        $('startBtn').addEventListener('click', startGame);
+        $('next').addEventListener('click', nextQuestion);
+        $('prev').addEventListener('click', () => {
+            if (current > 0) {
+                current -= 1;
+                renderQuestion();
+            }
+        });
+        $('again').addEventListener('click', () => {
+            current = 0;
+            good = 0;
+            answers = [];
+            $('result').classList.add('hidden');
+            $('start').classList.remove('hidden');
+            $('student').value = sessionStorage.getItem('egel_student_name') || '';
+            $('group').value = sessionStorage.getItem('egel_student_group') || '';
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedName = sessionStorage.getItem('egel_student_name') || '';
+            const storedGroup = sessionStorage.getItem('egel_student_group') || '';
+            $('student').value = storedName;
+            $('group').value = storedGroup;
+        });
+    </script>
+</body>
+</html>
