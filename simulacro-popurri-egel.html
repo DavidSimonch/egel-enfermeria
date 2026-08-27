@@ -48,6 +48,7 @@
                 </div>
             </div>
             <div class="actions">
+                <button class="btn secondary" id="menuFromStart" type="button">🏠 Menú de opciones</button>
                 <button class="btn primary" id="startBtn" type="button">Comenzar →</button>
             </div>
         </section>
@@ -84,7 +85,7 @@
             </div>
             <div class="review" id="review"></div>
             <div class="actions">
-                <button class="btn secondary" id="menuBtn" type="button">🏠 Menú principal</button>
+                <button class="btn secondary" id="menuBtn" type="button">🏠 Menú de opciones</button>
                 <button class="btn soft" type="button" onclick="window.print()">🖨️ Imprimir / PDF</button>
                 <button class="btn primary" id="again" type="button">↻ Repetir</button>
             </div>
@@ -312,6 +313,10 @@
             }
         });
         function returnToMenu() {
+            window.location.href = 'index.html';
+        }
+
+        $('again').addEventListener('click', () => {
             current = 0;
             good = 0;
             answers = [];
@@ -320,15 +325,10 @@
             $('start').classList.remove('hidden');
             $('student').value = sessionStorage.getItem('egel_student_name') || '';
             $('group').value = sessionStorage.getItem('egel_student_group') || '';
-        }
-
-        $('again').addEventListener('click', () => {
-            returnToMenu();
         });
 
-        $('menuBtn').addEventListener('click', () => {
-            returnToMenu();
-        });
+        $('menuBtn').addEventListener('click', returnToMenu);
+        $('menuFromStart').addEventListener('click', returnToMenu);
 
         document.addEventListener('DOMContentLoaded', () => {
             const storedName = sessionStorage.getItem('egel_student_name') || '';
