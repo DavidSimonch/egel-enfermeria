@@ -101,7 +101,7 @@
     </div>
 
     <script>
-        const DATA = [
+        const FALLBACK_DATA = [
             {
                 title: 'Prevención en comunidad',
                 scenario: 'Una comunidad presenta alta frecuencia de diarrea infantil por falta de higiene y agua segura.',
@@ -200,6 +200,10 @@
             }
         ];
 
+        const QUESTION_BANK = Array.isArray(window.BANCO_PREGUNTAS_EGEL) && window.BANCO_PREGUNTAS_EGEL.length
+            ? window.BANCO_PREGUNTAS_EGEL
+            : FALLBACK_DATA;
+
         const student = sessionStorage.getItem('egel_student_name');
         const group = sessionStorage.getItem('egel_student_group') || '';
         let current = 0;
@@ -218,11 +222,16 @@
             return copy;
         }
 
+        function sampleQuestions(pool, targetCount = 12) {
+            const shuffled = shuffleItems(pool);
+            return shuffled.slice(0, Math.min(targetCount, shuffled.length));
+        }
+
         function startFreshRound() {
             current = 0;
             good = 0;
             answers = [];
-            playOrder = shuffleItems(DATA);
+            playOrder = sampleQuestions(QUESTION_BANK, 12);
         }
 
         function startGame() {
@@ -241,12 +250,13 @@
         }
 
         function renderQuestion() {
-            const q = playOrder[current] || DATA[current];
+            const q = playOrder[current] || QUESTION_BANK[current] || FALLBACK_DATA[current];
             const studentName = $('student').value.trim() || sessionStorage.getItem('egel_student_name') || 'Estudiante';
             const sectionText = $('group').value.trim() || sessionStorage.getItem('egel_student_group') || '';
+            const totalQuestions = playOrder.length || QUESTION_BANK.length || FALLBACK_DATA.length;
             $('who').textContent = sectionText ? `${studentName} · ${sectionText}` : studentName;
-            $('count').textContent = `${current + 1} de ${playOrder.length || DATA.length}`;
-            $('bar').style.width = `${(((current + 1) / (playOrder.length || DATA.length)) * 100)}%`;
+            $('count').textContent = `${current + 1} de ${totalQuestions}`;
+            $('bar').style.width = `${(((current + 1) / totalQuestions) * 100)}%`;
             $('qtitle').textContent = q.title;
             $('scenario').textContent = q.scenario;
             $('prompt').textContent = q.prompt;
@@ -285,7 +295,7 @@
         }
 
         function chooseAnswer(index) {
-            const q = playOrder[current] || DATA[current];
+            const q = playOrder[current] || QUESTION_BANK[current] || FALLBACK_DATA[current];
             const correct = index === q.answer;
             if (correct) good += 1;
             answers[current] = { selected: index, correct };
@@ -293,7 +303,8 @@
         }
 
         function nextQuestion() {
-            if (current < DATA.length - 1) {
+            const totalQuestions = playOrder.length || QUESTION_BANK.length || FALLBACK_DATA.length;
+            if (current < totalQuestions - 1) {
                 current += 1;
                 renderQuestion();
             } else {
@@ -304,7 +315,7 @@
         function finish() {
             $('game').classList.add('hidden');
             $('result').classList.remove('hidden');
-            const total = playOrder.length || DATA.length;
+            const total = playOrder.length || QUESTION_BANK.length || FALLBACK_DATA.length;
             const percent = Math.round((good / total) * 100);
             const level = percent >= 90 ? 'Excelente' : percent >= 80 ? 'Satisfactorio' : percent >= 70 ? 'En proceso' : 'Reforzar';
             $('rname').textContent = $('group').value.trim() ? `${$('student').value.trim()} · Grupo/Sección: ${$('group').value.trim()}` : $('student').value.trim();
@@ -320,7 +331,7 @@
                 const selected = answers[index];
                 const item = document.createElement('div');
                 item.innerHTML = `
-                    <strong>${index + 1}. ${q.title}</strong>
+                    <strong>${index + 1}. ${q.title || q.prompt}</strong>
                     <div><b>${selected && selected.correct ? '✅ Correcto' : '❌ Incorrecto'}</b></div>
                     <small>Tu respuesta: ${selected ? q.options[selected.selected] : 'Sin respuesta'}</small>
                     <small>Respuesta correcta: ${q.options[q.answer]}</small>
