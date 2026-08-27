@@ -13,9 +13,10 @@
         .wrap{max-width:980px;margin:auto;padding:24px 15px 60px}.hero{background:linear-gradient(135deg,#173f73,var(--navy));color:#fff;border-radius:26px;padding:26px;box-shadow:0 16px 38px #173f7320}
         .hero h1{margin:0 0 7px;font-size:clamp(27px,5vw,42px)}.hero p{margin:5px 0;color:#edf4fb}.author{font-weight:900!important}
         .card{background:#fff;border:1px solid #edf1f6;border-radius:22px;padding:22px;margin-top:20px;box-shadow:0 14px 34px #173f7314}
-        .grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}.top{display:flex;justify-content:space-between;gap:9px;flex-wrap:wrap}
+        .grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}.top{display:flex;justify-content:space-between;gap:9px;flex-wrap:wrap}.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
         .badge{display:inline-block;padding:7px 11px;border-radius:999px;background:var(--soft);color:var(--navy);font-size:13px;font-weight:900}.label{display:block;font-weight:800;font-size:14px;margin-bottom:6px}input{width:100%;padding:13px;border:1px solid var(--line);border-radius:13px;font-size:16px}label{display:block;font-weight:800;font-size:14px;margin-bottom:6px}
-        .btn{border:0;border-radius:13px;padding:12px 17px;font-weight:900;font-size:15px;cursor:pointer}.primary{background:var(--navy);color:#fff}.soft{background:var(--soft);color:var(--navy)}.secondary{background:#f2f6fb;color:var(--navy);border:1px solid var(--line)}
+        .btn{border:0;border-radius:13px;padding:12px 17px;font-weight:900;font-size:15px;cursor:pointer}.primary{background:var(--navy);color:#fff}.soft{background:var(--soft);color:var(--navy)}.secondary{background:#f2f6fb;color:var(--navy);border:1px solid var(--line)}.btn.small{padding:8px 12px;font-size:13px}
+        .menu-fixed{position:fixed;top:18px;right:18px;z-index:30;display:none}.menu-fixed.visible{display:block}.menu-fixed .btn{box-shadow:0 8px 22px rgba(22,59,101,.22)}
         .actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin-top:17px}.hidden{display:none!important}.note{color:var(--muted);line-height:1.55}
         .progress{height:10px;background:#e9eef4;border-radius:999px;overflow:hidden;margin:13px 0 19px}.progress>div{height:100%;background:linear-gradient(90deg,#0c6cb5,var(--teal));transition:.2s}
         .case{background:#f9fbfd;border:1px solid #e3eaf2;border-radius:17px;padding:17px;line-height:1.55}.case h2{margin:0 0 7px}.options{display:grid;gap:10px;margin-top:14px}.opt{border:2px solid #e2e8f0;background:#fff;border-radius:14px;padding:13px 14px;text-align:left;font-weight:800;cursor:pointer;font-size:15px;transition:.15s ease}.opt:hover{border-color:#9bb7d9}.opt.good{border-color:#65c88f;background:#effaf3;color:#145f38}.opt.bad{border-color:#e99b94;background:#fff3f2;color:#8b211b}.opt:disabled{cursor:default}
@@ -26,6 +27,9 @@
     </style>
 </head>
 <body>
+    <div class="menu-fixed" id="menuFixed">
+        <button class="btn secondary small" type="button">🏠 Menú</button>
+    </div>
     <div class="wrap">
         <section class="hero">
             <h1>🎯 Popurrí EGEL</h1>
@@ -246,6 +250,7 @@
             startFreshRound();
             $('start').classList.add('hidden');
             $('game').classList.remove('hidden');
+            $('menuFixed').classList.add('visible');
             renderQuestion();
         }
 
@@ -354,23 +359,31 @@
             window.location.href = 'index.html';
         }
 
-        function restartRandomRound() {
-            startFreshRound();
+        function resetRoundUI() {
             $('result').classList.add('hidden');
             $('game').classList.remove('hidden');
+            $('start').classList.add('hidden');
+            $('next').classList.add('hidden');
+            $('prev').classList.add('hidden');
+            $('fb').className = 'feedback';
+            $('fb').innerHTML = '';
+            $('review').innerHTML = '';
+            $('menuFixed').classList.add('visible');
+        }
+
+        function restartRandomRound() {
+            startFreshRound();
+            resetRoundUI();
+            $('menuFixed').classList.add('visible');
             renderQuestion();
         }
 
-        $('again').addEventListener('click', () => {
-            startFreshRound();
-            $('result').classList.add('hidden');
-            $('game').classList.remove('hidden');
-            renderQuestion();
-        });
+        $('again').addEventListener('click', restartRandomRound);
         $('againRandom').addEventListener('click', restartRandomRound);
         $('shuffleGame').addEventListener('click', restartRandomRound);
         $('menuDuringGame').addEventListener('click', returnToMenu);
         $('menuFloating').addEventListener('click', returnToMenu);
+        $('menuFixed').addEventListener('click', returnToMenu);
         $('menuBtn').addEventListener('click', returnToMenu);
         $('menuFromStart').addEventListener('click', returnToMenu);
 
@@ -379,6 +392,9 @@
             const storedGroup = sessionStorage.getItem('egel_student_group') || '';
             $('student').value = storedName;
             $('group').value = storedGroup;
+            if (storedName) {
+                $('menuFixed').classList.add('visible');
+            }
         });
     </script>
 </body>
