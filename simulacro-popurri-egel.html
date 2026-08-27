@@ -56,7 +56,10 @@
         <section id="game" class="card hidden">
             <div class="top">
                 <span class="badge" id="who"></span>
-                <span class="badge" id="count"></span>
+                <div class="top-actions">
+                    <span class="badge" id="count"></span>
+                    <button class="btn secondary small" id="menuFloating" type="button">🏠 Menú</button>
+                </div>
             </div>
             <div class="progress"><div id="bar"></div></div>
             <div class="case">
@@ -67,6 +70,8 @@
             <div class="options" id="opts"></div>
             <div id="fb" class="feedback"></div>
             <div class="actions">
+                <button class="btn secondary" id="menuDuringGame" type="button">🏠 Menú</button>
+                <button class="btn soft" id="shuffleGame" type="button">🎲 Nuevo aleatorio</button>
                 <button class="btn secondary hidden" id="prev" type="button">← Anterior</button>
                 <button class="btn primary hidden" id="next" type="button">Siguiente →</button>
             </div>
@@ -86,6 +91,7 @@
             <div class="review" id="review"></div>
             <div class="actions">
                 <button class="btn secondary" id="menuBtn" type="button">🏠 Menú de opciones</button>
+                <button class="btn soft" id="againRandom" type="button">🎲 Otro aleatorio</button>
                 <button class="btn soft" type="button" onclick="window.print()">🖨️ Imprimir / PDF</button>
                 <button class="btn primary" id="again" type="button">↻ Repetir</button>
             </div>
@@ -199,8 +205,25 @@
         let current = 0;
         let good = 0;
         let answers = [];
+        let playOrder = [];
 
         const $ = (id) => document.getElementById(id);
+
+        function shuffleItems(items) {
+            const copy = [...items];
+            for (let i = copy.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function startFreshRound() {
+            current = 0;
+            good = 0;
+            answers = [];
+            playOrder = shuffleItems(DATA);
+        }
 
         function startGame() {
             const name = $('student').value.trim();
@@ -211,16 +234,19 @@
             }
             sessionStorage.setItem('egel_student_name', name);
             sessionStorage.setItem('egel_student_group', section);
+            startFreshRound();
             $('start').classList.add('hidden');
             $('game').classList.remove('hidden');
             renderQuestion();
         }
 
         function renderQuestion() {
-            const q = DATA[current];
-            $('who').textContent = group || $('student').value.trim() || 'Estudiante';
-            $('count').textContent = `${current + 1} de ${DATA.length}`;
-            $('bar').style.width = `${((current + 1) / DATA.length) * 100}%`;
+            const q = playOrder[current] || DATA[current];
+            const studentName = $('student').value.trim() || sessionStorage.getItem('egel_student_name') || 'Estudiante';
+            const sectionText = $('group').value.trim() || sessionStorage.getItem('egel_student_group') || '';
+            $('who').textContent = sectionText ? `${studentName} · ${sectionText}` : studentName;
+            $('count').textContent = `${current + 1} de ${playOrder.length || DATA.length}`;
+            $('bar').style.width = `${(((current + 1) / (playOrder.length || DATA.length)) * 100)}%`;
             $('qtitle').textContent = q.title;
             $('scenario').textContent = q.scenario;
             $('prompt').textContent = q.prompt;
@@ -259,7 +285,7 @@
         }
 
         function chooseAnswer(index) {
-            const q = DATA[current];
+            const q = playOrder[current] || DATA[current];
             const correct = index === q.answer;
             if (correct) good += 1;
             answers[current] = { selected: index, correct };
@@ -278,7 +304,7 @@
         function finish() {
             $('game').classList.add('hidden');
             $('result').classList.remove('hidden');
-            const total = DATA.length;
+            const total = playOrder.length || DATA.length;
             const percent = Math.round((good / total) * 100);
             const level = percent >= 90 ? 'Excelente' : percent >= 80 ? 'Satisfactorio' : percent >= 70 ? 'En proceso' : 'Reforzar';
             $('rname').textContent = $('group').value.trim() ? `${$('student').value.trim()} · Grupo/Sección: ${$('group').value.trim()}` : $('student').value.trim();
@@ -290,7 +316,7 @@
 
             const review = $('review');
             review.innerHTML = '<h3>Revisión</h3>';
-            DATA.forEach((q, index) => {
+            playOrder.forEach((q, index) => {
                 const selected = answers[index];
                 const item = document.createElement('div');
                 item.innerHTML = `
@@ -312,21 +338,28 @@
                 renderQuestion();
             }
         });
+
         function returnToMenu() {
             window.location.href = 'index.html';
         }
 
-        $('again').addEventListener('click', () => {
-            current = 0;
-            good = 0;
-            answers = [];
-            $('game').classList.add('hidden');
+        function restartRandomRound() {
+            startFreshRound();
             $('result').classList.add('hidden');
-            $('start').classList.remove('hidden');
-            $('student').value = sessionStorage.getItem('egel_student_name') || '';
-            $('group').value = sessionStorage.getItem('egel_student_group') || '';
-        });
+            $('game').classList.remove('hidden');
+            renderQuestion();
+        }
 
+        $('again').addEventListener('click', () => {
+            startFreshRound();
+            $('result').classList.add('hidden');
+            $('game').classList.remove('hidden');
+            renderQuestion();
+        });
+        $('againRandom').addEventListener('click', restartRandomRound);
+        $('shuffleGame').addEventListener('click', restartRandomRound);
+        $('menuDuringGame').addEventListener('click', returnToMenu);
+        $('menuFloating').addEventListener('click', returnToMenu);
         $('menuBtn').addEventListener('click', returnToMenu);
         $('menuFromStart').addEventListener('click', returnToMenu);
 
